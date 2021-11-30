@@ -24,11 +24,17 @@ class ReplaceToken:
 
   def __str__(self) -> str:
     if self.find is None: return ""
-    if self.replace is None:
+    if self.replace == "":
       return "Remove '" + self.find + "'"
     return "Replace '" + self.find + "' with '" + self.replace + "'"
 
-def Process(old : str, new : str):
+  def applyTo(self, old) -> str:
+    return re.sub(
+      r"\b" + re.escape(self.find) + r"\b",
+      self.replace,
+      old)
+
+def Process(old : str, new : str) -> [ReplaceToken, None]
   oT = old.split()
   nT = new.split()
 
@@ -40,6 +46,7 @@ def Process(old : str, new : str):
   fr = {}
 
   for (cur, nex) in U.pairwise(s):
+    # Start with the trivial 1->1 token replacement
     if (cur.a + cur.size + 1 == nex.a and
         cur.b + cur.size + 1 == nex.b):
       # oooh we've got a thing found and replaced.
@@ -49,8 +56,7 @@ def Process(old : str, new : str):
       fr[f] = r
 
   if len(fr) == 0:
-    # No token sequences - NYI
-    raise
+    return None
 
   biggestString = ""
 
