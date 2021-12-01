@@ -5,6 +5,10 @@ import textwrap
 
 from DiffCalcs import ReplaceToken as t
 
+print("""
+Running all DiffCalc unit tests:
+""")
+
 for a in pkgutil.iter_modules(['DiffCalcs']):
   if a.name == "U": continue
 
@@ -16,8 +20,10 @@ for a in pkgutil.iter_modules(['DiffCalcs']):
     t.__dict__[a.name].__doc__).strip()
 
   for run in doco.split("\n=")[1:]:
-    if len(run.strip()) == 0: break
+    if len(run.strip()) == 0: continue
     (token, string) = run.split("\n",1)
+
+    token = token.strip()
 
     if token == "Old":
       old = string
@@ -27,11 +33,17 @@ for a in pkgutil.iter_modules(['DiffCalcs']):
       actualSummary = str(t.Process(old, new))
       expectedSummary = string
       assert(actualSummary == expectedSummary)
+      print("old:\n" + old)
+      print("new:\n" + new)
+      print("summary:\n" + actualSummary)
     elif token == "ApplyTo":
       diff = t.Process(old, new)
       appliedResult = diff.applyTo(string)
     elif token == "Expect":
       expectedResult = string
       assert(appliedResult == expectedResult)
+      print("applied to:\n" + appliedResult)
+      print("new:\n" + expectedResult)
+    elif token == "#": continue
     else:
       raise

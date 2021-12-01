@@ -22,6 +22,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AutoMerge.py" />
+    <Compile Include="DecorLib\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DiffCalcs\ReplaceToken.py" />
     <Compile Include="DiffCalcs\U.py" />
     <Compile Include="DiffCalcs\__init__.py">
@@ -36,6 +39,7 @@
     <Compile Include="UnitTest.py" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="DecorLib\" />
     <Folder Include="DiffCalcs\" />
     <Folder Include="EqualCalcs\" />
     <Folder Include="MergeSimplifiers\" />

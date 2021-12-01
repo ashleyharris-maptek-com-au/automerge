@@ -3,9 +3,8 @@ from . import U
 
 class ReplaceToken:
   """
-  Represents a simple find and replace, done textually.
-
-
+  Represents a simple find and replace, done textually, respecting
+  word boundaries.
 
   =Old
   This is a simple example.
@@ -17,29 +16,69 @@ class ReplaceToken:
   This is a simple example!
   =Expect
   This was a simple example!
+  =
+
+  =Old
+  myOldApi->Function4(arg1, arg2)
+  =New
+  myNewApi->Function4(
+    arg1, 
+    arg2)
+  =Summary
+  Replace 'myOldApi' with 'myNewApi'
+  =
+
+  =Old
+  // This is a com about how amaing autoMerge is
+  // when calculating diffs.
+  =New
+  // This is a long comment about how amazing autoMerge is
+  // when calculating diff's.
+  =Summary
+  Replace 'amaing' with 'amazing'
+  =ApplyTo
+  /* This is a coment about how  *
+   * amaing autoMerge is         *
+   * when calculating diffs.     */
+  =Expect
+  /* This is a coment about how  *
+   * amazing autoMerge is         *
+   * when calculating diffs.     */
+  =# 
+  Note that it should only replace one token - the longest, and it 
+  doesn't correct the border of *'s here - that's in the decor lib.
   """
   def __init__(self) -> None:
-    self.find = None
-    self.replace = None
+    self.tr = {}
 
   def __str__(self) -> str:
-    if self.find is None: return ""
-    if self.replace == "":
-      return "Remove '" + self.find + "'"
-    return "Replace '" + self.find + "' with '" + self.replace + "'"
+    out = ""
+    for (f, r) in self.tr.items():
+      if r == "":
+        out += "Remove '" + f + "'\n"
+      else:
+       out += "Replace '" + f + "' with '" + r + "'\n"
 
-  def applyTo(self, old) -> str:
-    return re.sub(
-      r"\b" + re.escape(self.find) + r"\b",
-      self.replace,
-      old)
+    return out.strip();
 
-def Process(old : str, new : str) -> [ReplaceToken, None]
-  oT = old.split()
-  nT = new.split()
+  def applyTo(self, text) -> str:
+
+    for (f, r) in self.tr.items():
+      text = re.sub(
+        r"\b" + re.escape(f) + r"\b",
+        r,
+        text)
+    return text
+
+def Process(old : str, new : str):
+  oT = re.findall(r"\b\w+\b",old)
+  nT = re.findall(r"\b\w+\b",new)
 
   s = difflib.SequenceMatcher(None, oT, nT).get_matching_blocks()
   
+  # We append 2 null matches at the start and end of the list, so
+  # that we can iterate in pairs and get find token sequences between
+  # matching sequences.
   s.insert(0, difflib.Match(-1, -1, 1))
   s.append(difflib.Match(len(oT), len(nT), 1))
 
@@ -79,7 +118,6 @@ def Process(old : str, new : str) -> [ReplaceToken, None]
   if biggestString == "": return None
 
   rt = ReplaceToken()
-  rt.find = biggestString
-  rt.replace = fr[biggestString]
+  rt.tr[biggestString] = fr[biggestString]
   return rt
 
