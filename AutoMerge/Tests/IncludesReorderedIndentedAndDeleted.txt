@@ -1,0 +1,41 @@
+=GitMerge
+#include "mdf/system/sys.H"
+
+#ifdef MDF_OS_WIN32
+#  include "mdf/string/Unicode.H"
+
+<<<<<<< HEAD
+#  include <setupapi.h>
+#  include <windows.h>
+||||||| merged common ancestors
+#include <windows.h>
+#include <setupapi.h>
+=======
+#  include <Windows.h>
+>>>>>>> 8e50aebc0ec095ee023426260ee99b013193c8f1
+
+#  include <setupapi.h>
+#endif
+
+using namespace mdf;
+=#
+
+Comes from actual code base, a mix of 4 actions:
+- Includes sorted alphabetically on one branch
+- Includes indented by a formatting tool
+- Includes seperated by a blankline to group, but the merge conflict marker hides this detail
+- Captialisation of Windows changed.
+
+=Resolved
+#include "mdf/system/sys.H"
+
+#ifdef MDF_OS_WIN32
+#  include "mdf/string/Unicode.H"
+
+#  include <Windows.h>
+
+#  include <setupapi.h>
+#endif
+
+using namespace mdf;
+=#
