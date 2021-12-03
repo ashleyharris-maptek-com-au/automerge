@@ -37,3 +37,13 @@ text argument, modified by the diff if possible.
 
 """
 
+import pkgutil
+
+allDiffGenerators = []
+
+for a in pkgutil.iter_modules(['DiffCalcs']):
+  exec("from DiffCalcs import " + a.name + " as t")
+
+  if "Process" in t.__dir__:
+    allDiffGenerators.append(t.Process)
+

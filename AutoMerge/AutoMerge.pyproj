@@ -33,6 +33,9 @@
     <Compile Include="DiffCalcs\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DiffSolver.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Document.py">
       <SubType>Code</SubType>
     </Compile>

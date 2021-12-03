@@ -78,6 +78,7 @@ m.fromString("""
 <<<<<<< HEAD
 	  number += 1;
 ||||||| merged common ancestors
+     number += 2;
 =======
       number += 1;
 >>>>>>> 23688f0157c7b079005d11aee4cb1675476af88b
@@ -87,3 +88,4 @@ m.fromString("""
 """)
 
 sys.exit()
+
