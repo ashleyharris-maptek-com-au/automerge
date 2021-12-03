@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>afb45b2b-c372-4875-b696-5df4e353d0aa</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>UnitTest.py</StartupFile>
+    <StartupFile>Merge.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -33,7 +33,16 @@
     <Compile Include="DiffCalcs\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Document.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="EquallityLib\__init__.py" />
+    <Compile Include="Merge.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MergeSimplifiers\IncorrectScoping.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="MergeSimplifiers\__init__.py">
       <SubType>Code</SubType>
     </Compile>
@@ -47,6 +56,9 @@
     <Folder Include="Tests\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Tests\ActualLeak.txt" />
+    <Content Include="Tests\DoubleTokenRename.txt" />
+    <Content Include="Tests\HugeChunkDeletedWithTinyAddition.txt" />
     <Content Include="Tests\IncludesReorderedIndentedAndDeleted.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

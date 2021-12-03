@@ -1,0 +1,264 @@
+=#
+This one involves:
+- Clangformat running on one and not the other
+- Two QAers renaming 2 two different variables at once
+- Git messing up the boundaries of the commits - note that some of the 
+  "good" part of the document is duplicated in the expeected and new chunks, and
+  chunks from one merge conflict make their way into the other.
+
+      for (auto& pl : renderableInfo.myPipelines)
+      {
+<<<<<<< HEAD
+        bufferGroup.ForAllPipelineBuffers(
+          pl, [&](S_BufferPipeline* BufferPipeline)
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+        bufferGroup.ForAllPipelineBuffers(pl, [&](S_BufferPipeline* BufferPipeline)
+        {
+          ASSERT(BufferPipeline);
+          auto& ppd = *BufferPipeline;
+
+          if (ppd.myIndirectDrawFreeList.size() == 0)
+=======
+        bufferGroup.ForAllPipelineBuffers(pl, [&](S_BufferPipeline* BufferPipeline)
+        {
+          ASSERT(BufferPipeline);
+          auto& perPipelineData = *BufferPipeline;
+
+          if (perPipelineData.myIndirectDrawFreeList.size() == 0)
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+          {
+            ASSERT(BufferPipeline);
+            auto& ppd = *BufferPipeline;
+
+<<<<<<< HEAD
+            if (ppd.myIndirectDrawFreeList.size() == 0)
+            {
+              // Need to re-alloc the visibility buffer and copy data over.
+              ASSUME_NYI();
+            }
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+          auto& freeEntry = ppd.myIndirectDrawFreeList.back();
+          auto allocation = freeEntry.first;
+          freeEntry.first += 1;
+          freeEntry.second -= 1;
+=======
+          auto& freeEntry = perPipelineData.myIndirectDrawFreeList.back();
+          auto allocation = freeEntry.first;
+          freeEntry.first += 1;
+          freeEntry.second -= 1;
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+            auto& freeEntry = ppd.myIndirectDrawFreeList.back();
+            auto allocation = freeEntry.first;
+            freeEntry.first += 1;
+            freeEntry.second -= 1;
+
+<<<<<<< HEAD
+            renderableInfo.myVisibilitySlots.push_back(Tint16u(allocation));
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+          if (freeEntry.second == 0)
+          {
+            ppd.myIndirectDrawFreeList.pop_back();
+          }
+=======
+          if (freeEntry.second == 0)
+          {
+            perPipelineData.myIndirectDrawFreeList.pop_back();
+          }
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+            if (freeEntry.second == 0)
+            {
+              ppd.myIndirectDrawFreeList.pop_back();
+            }
+
+<<<<<<< HEAD
+            auto activeCountLowerBound = allocation + 1;
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+          if (activeCountLowerBound > ppd.myIndirectDrawArrayLastActive)
+          {
+            ppd.myIndirectDrawArrayLastActive = activeCountLowerBound;
+=======
+          if (activeCountLowerBound > perPipelineData.myIndirectDrawArrayLastActive)
+          {
+            perPipelineData.myIndirectDrawArrayLastActive = activeCountLowerBound;
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+            if (activeCountLowerBound > ppd.myIndirectDrawArrayLastActive)
+            {
+              ppd.myIndirectDrawArrayLastActive = activeCountLowerBound;
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            Tint32u dataBuffer = ppd.myIndirectDrawArrayLastActive;
+=======
+            Tint32u dataBuffer = perPipelineData.myIndirectDrawArrayLastActive;
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              Tint32u dataBuffer = ppd.myIndirectDrawArrayLastActive;
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            std::memcpy(ppd.myShadowDrawBuffer.data() +
+                          stride * ppd.myIndirectDrawArrayCapacity,
+                        &dataBuffer,
+                        sizeof(Tint32u));
+=======
+            std::memcpy(perPipelineData.myShadowDrawBuffer.data() +
+                          stride * perPipelineData.myIndirectDrawArrayCapacity,
+                        &dataBuffer,
+                        sizeof(Tint32u));
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              std::memcpy(ppd.myShadowDrawBuffer.data() +
+                            stride * ppd.myIndirectDrawArrayCapacity,
+                          &dataBuffer,
+                          sizeof(Tint32u));
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            ppd.myShadowFirstChangedByte = std::min<Tint32u>(
+              ppd.myShadowFirstChangedByte,
+              Tint32u(stride * ppd.myIndirectDrawArrayCapacity));
+=======
+            perPipelineData.myShadowFirstChangedByte = std::min<Tint32u>(
+              perPipelineData.myShadowFirstChangedByte,
+              Tint32u(stride * perPipelineData.myIndirectDrawArrayCapacity));
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              ppd.myShadowFirstChangedByte = std::min<Tint32u>(
+                ppd.myShadowFirstChangedByte,
+                Tint32u(stride * ppd.myIndirectDrawArrayCapacity));
+
+              ppd.myShadowLastChangedByte = std::max<Tint32u>(
+                ppd.myShadowLastChangedByte,
+                Tint32u(stride * ppd.myIndirectDrawArrayCapacity +
+                        sizeof(Tint32u)));
+            }
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            ppd.myShadowLastChangedByte = std::max<Tint32u>(
+              ppd.myShadowLastChangedByte,
+              Tint32u(stride * ppd.myIndirectDrawArrayCapacity +
+                      sizeof(Tint32u)));
+          }
+=======
+            perPipelineData.myShadowLastChangedByte = std::max<Tint32u>(
+              perPipelineData.myShadowLastChangedByte,
+              Tint32u(stride * perPipelineData.myIndirectDrawArrayCapacity +
+                      sizeof(Tint32u)));
+          }
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+            ASSUME(renderableInfo.myVertexOffset != Tint32u(-1));
+
+            if (bufferLayout.hasIndexBuffer)
+            {
+              ASSUME(renderableInfo.myIndexOffset != Tint32u(-1));
+
+              C_Rn::IndexedIndirectDrawParams dataBuffer;
+
+              dataBuffer.firstInstance = 0;
+              dataBuffer.instanceCount = 1;
+              dataBuffer.vertexOffset = renderableInfo.myVertexOffset;
+              dataBuffer.firstIndex = renderableInfo.myIndexOffset;
+              dataBuffer.indexCount = renderableInfo.myIndexCount;
+
+<<<<<<< HEAD
+              std::memcpy(ppd.myShadowDrawBuffer.data() + stride * allocation,
+                          &dataBuffer,
+                          sizeof(dataBuffer));
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            std::memcpy(ppd.myShadowDrawBuffer.data() + stride * allocation,
+                        &dataBuffer,
+                        sizeof(dataBuffer));
+=======
+            std::memcpy(perPipelineData.myShadowDrawBuffer.data() + stride * allocation,
+                        &dataBuffer,
+                        sizeof(dataBuffer));
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              ppd.myShadowFirstChangedByte = std::min<Tint32u>(
+                ppd.myShadowFirstChangedByte, Tint32u(stride * allocation));
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            ppd.myShadowFirstChangedByte = std::min<Tint32u>(
+              ppd.myShadowFirstChangedByte, Tint32u(stride * allocation));
+=======
+            perPipelineData.myShadowFirstChangedByte = std::min<Tint32u>(
+              perPipelineData.myShadowFirstChangedByte, Tint32u(stride * allocation));
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              ppd.myShadowLastChangedByte = std::max<Tint32u>(
+                ppd.myShadowLastChangedByte,
+                Tint32u(stride * allocation + sizeof(dataBuffer)));
+            }
+            else
+            {
+              C_Rn::IndirectDrawParams dataBuffer;
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            ppd.myShadowLastChangedByte = std::max<Tint32u>(
+              ppd.myShadowLastChangedByte,
+              Tint32u(stride * allocation + sizeof(dataBuffer)));
+          }
+          else
+          {
+            C_Rn::IndirectDrawParams dataBuffer;
+=======
+            perPipelineData.myShadowLastChangedByte = std::max<Tint32u>(
+              perPipelineData.myShadowLastChangedByte,
+              Tint32u(stride * allocation + sizeof(dataBuffer)));
+          }
+          else
+          {
+            C_Rn::IndirectDrawParams dataBuffer;
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+              dataBuffer.firstInstance = 0;
+              dataBuffer.instanceCount = 1;
+              dataBuffer.firstVertex = renderableInfo.myVertexOffset;
+              dataBuffer.vertexCount = renderableInfo.myVertexCount;
+
+<<<<<<< HEAD
+              std::memcpy(ppd.myShadowDrawBuffer.data() + stride * allocation,
+                          &dataBuffer,
+                          sizeof(dataBuffer));
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            std::memcpy(ppd.myShadowDrawBuffer.data() + stride * allocation,
+                        &dataBuffer,
+                        sizeof(dataBuffer));
+=======
+            std::memcpy(perPipelineData.myShadowDrawBuffer.data() + stride * allocation,
+                        &dataBuffer,
+                        sizeof(dataBuffer));
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              ppd.myShadowFirstChangedByte = std::min<Tint32u>(
+                ppd.myShadowFirstChangedByte, Tint32u(stride * allocation));
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            ppd.myShadowFirstChangedByte = std::min<Tint32u>(
+              ppd.myShadowFirstChangedByte, Tint32u(stride * allocation));
+=======
+            perPipelineData.myShadowFirstChangedByte = std::min<Tint32u>(
+              perPipelineData.myShadowFirstChangedByte, Tint32u(stride * allocation));
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+
+<<<<<<< HEAD
+              ppd.myShadowLastChangedByte = std::max<Tint32u>(
+                ppd.myShadowLastChangedByte,
+                Tint32u(stride * allocation + sizeof(dataBuffer)));
+            }
+          });
+||||||| parent of 9c1ba785e2e... @@firstRenderPass@@QA
+            ppd.myShadowLastChangedByte = std::max<Tint32u>(
+              ppd.myShadowLastChangedByte,
+              Tint32u(stride * allocation + sizeof(dataBuffer)));
+          }
+        });
+=======
+            perPipelineData.myShadowLastChangedByte = std::max<Tint32u>(
+              perPipelineData.myShadowLastChangedByte,
+              Tint32u(stride * allocation + sizeof(dataBuffer)));
+          }
+        });
+>>>>>>> 9c1ba785e2e... @@firstRenderPass@@QA
+      }
