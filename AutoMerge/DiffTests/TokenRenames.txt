@@ -1,0 +1,12 @@
+=Old
+  for (auto [pd, po] :
+    ctlN_Iterate::Bind(rm.myPasses, rm.myPassObjects))
+=New
+  for (auto [passDesc, passObjects] :
+    ctlN_Iterate::Bind(renderMode.myPasses, 
+                       renderMode.myPassObjects))
+=Summary
+Replace 'po' with 'passObjects'
+Replace 'pd' with 'passDesc'
+Replace 'rm' with 'renderMode'
+=
