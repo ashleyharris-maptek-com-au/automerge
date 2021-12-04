@@ -3,6 +3,7 @@ import DiffCalcs
 import pkgutil
 import textwrap
 import DiffSolver
+import os
 
 from DiffCalcs import ReplaceToken as t
 
@@ -11,7 +12,7 @@ Running all DiffCalc unit tests:
 """)
 
 def runDiffTests(string, process):
-  for run in doco.split("\n=")[1:]:
+  for run in ("\n" + string).split("\n=")[1:]:
     if len(run.strip()) == 0: continue
     (token, string) = run.split("\n",1)
 
@@ -19,23 +20,31 @@ def runDiffTests(string, process):
 
     if token == "Old":
       old = string
+
     elif token == "New":
       new = string
+
     elif token == "Summary":
       actualSummary = str(process(old, new))
       expectedSummary = string
-      assert(actualSummary == expectedSummary)
       print("old:\n" + old)
       print("new:\n" + new)
       print("summary:\n" + actualSummary)
+
+      assert(actualSummary.strip() == expectedSummary.strip())
+
     elif token == "ApplyTo":
       diff = process(old, new)
       appliedResult = diff.applyTo(string)
+
     elif token == "Expect":
       expectedResult = string
-      assert(appliedResult == expectedResult)
+
       print("applied to:\n" + appliedResult)
       print("new:\n" + expectedResult)
+
+      assert(appliedResult == expectedResult)
+
     elif token == "#": continue
     else:
       raise
@@ -51,10 +60,13 @@ for a in pkgutil.iter_modules(['DiffCalcs']):
 
   exec("from DiffCalcs import " + a.name + " as t")
 
-  doco = textwrap.dedent(
-    t.__dict__[a.name].__doc__).strip()
+  doco = t.__dict__[a.name].__doc__
 
-  runDiffTests(doco, t.Process)
+  if doco is None: continue
+
+  doco = textwrap.dedent(doco).strip()
+
+#  runDiffTests(doco, t.Process)
 
 # 
 # Second - run tests over the entire library.

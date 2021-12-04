@@ -44,6 +44,6 @@ allDiffGenerators = []
 for a in pkgutil.iter_modules(['DiffCalcs']):
   exec("from DiffCalcs import " + a.name + " as t")
 
-  if "Process" in t.__dir__:
+  if "Process" in dir(t):
     allDiffGenerators.append(t.Process)
 

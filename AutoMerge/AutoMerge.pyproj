@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>afb45b2b-c372-4875-b696-5df4e353d0aa</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Merge.py</StartupFile>
+    <StartupFile>UnitTest.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -54,15 +54,17 @@
   <ItemGroup>
     <Folder Include="DecorLib\" />
     <Folder Include="DiffCalcs\" />
+    <Folder Include="DiffTests\" />
     <Folder Include="EquallityLib\" />
     <Folder Include="MergeSimplifiers\" />
-    <Folder Include="Tests\" />
+    <Folder Include="MergeTests\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Tests\ActualLeak.txt" />
-    <Content Include="Tests\DoubleTokenRename.txt" />
-    <Content Include="Tests\HugeChunkDeletedWithTinyAddition.txt" />
-    <Content Include="Tests\IncludesReorderedIndentedAndDeleted.txt" />
+    <Content Include="DiffTests\TokenRenames.txt" />
+    <Content Include="MergeTests\ActualLeak.txt" />
+    <Content Include="MergeTests\DoubleTokenRename.txt" />
+    <Content Include="MergeTests\HugeChunkDeletedWithTinyAddition.txt" />
+    <Content Include="MergeTests\IncludesReorderedIndentedAndDeleted.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

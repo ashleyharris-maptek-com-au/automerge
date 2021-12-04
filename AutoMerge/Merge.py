@@ -66,26 +66,3 @@ class Merge(object):
 
   def fromFile(self, path):
     self.fromStream(open(path))
-
-
-m = Merge()
-m.fromString("""
-    Tint32u number = 1;
-
-    while (ctlN::ContainsValue(myTransactionToVariableNameMap,
-                               VariableBaseName + mdf::ToString(number)))
-    {
-<<<<<<< HEAD
-	  number += 1;
-||||||| merged common ancestors
-     number += 2;
-=======
-      number += 1;
->>>>>>> 23688f0157c7b079005d11aee4cb1675476af88b
-    }
-
-    variableName += mdf::ToString(number);
-""")
-
-sys.exit()
-

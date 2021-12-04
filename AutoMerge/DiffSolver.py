@@ -29,7 +29,7 @@ class ChangeSequence:
       s += str(step)
       s += "\n"
 
-    return step
+    return s
 
   def applyTo(self, s):
     for step in self.steps:
