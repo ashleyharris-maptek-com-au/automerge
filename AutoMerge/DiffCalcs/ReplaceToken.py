@@ -62,7 +62,6 @@ class ReplaceToken:
     return out.strip();
 
   def applyTo(self, text) -> str:
-
     for (f, r) in self.tr.items():
       text = re.sub(
         r"\b" + re.escape(f) + r"\b",
@@ -100,7 +99,7 @@ def Process(old : str, new : str):
       # "Renderer->Draw(Object.Handle)" and "std::cout << std::endl" - Match?
       #
       # To solve - we look at the non-whitespace between the tokens, if that
-      # matches - we consider the token replaced.
+      # matches - we consider the token replaced. 
 
       oldPattern = r"\b" + re.escape(oT[cur.a + cur.size]) + r"\b(.+?)\b"
       oldPattern += r"\b" + re.escape(oT[cur.a + cur.size + 1]) + r"\b"

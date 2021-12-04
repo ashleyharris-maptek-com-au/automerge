@@ -45,7 +45,7 @@ def runDiffTests(string, process):
 
       assert(appliedResult == expectedResult)
 
-    elif token == "#": continue
+    elif token.startswith("#"): continue
     else:
       raise
 
