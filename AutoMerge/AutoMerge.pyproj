@@ -25,6 +25,7 @@
     <Compile Include="DecorLib\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DiffCalcs\RemovePartialSequence.py" />
     <Compile Include="DiffCalcs\ReplaceToken.py" />
     <Compile Include="DiffCalcs\StringReplacement.py">
       <SubType>Code</SubType>

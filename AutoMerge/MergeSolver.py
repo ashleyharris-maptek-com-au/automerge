@@ -48,7 +48,32 @@ def SolveMerge(m : Merge):
     o.cost = path.cost
     allOptions.append(o)
 
-  solvedSequences.sort(key = lambda x : x.cost)
+  allOptions.sort(key = lambda x : x.cost)
+
+  allResults = {}
+
+  for opt in allOptions:
+    active = ""
+    control = ""
+    controlTarget = ""
+
+    if opt.appliedTo == "en":
+      active = m.actual
+      control = m.expected
+      controlTarget = m.new
+    else:
+      active = m.new
+      control = m.expected
+      controlTarget = m.actual
+
+    activeRes = opt.changeSequence.applyTo(active)
+    controlRes = opt.changeSequence.applyTo(control)
+    
+    if activeRes in allResults: allResults[activeRes] += 1
+    else: allResults[activeRes] = 1
+
+  q = max(allResults, key=allResults.get)
+  return q
 
 m = Merge()
 m.fromString("""
@@ -64,3 +89,4 @@ m.fromString("""
 """)
 
 SolveMerge(m)
+

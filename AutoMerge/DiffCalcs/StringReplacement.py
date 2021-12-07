@@ -61,7 +61,43 @@ def Process(old : str, new : str):
       f = old[endOfA:nex.a]
       r = new[endOfB:nex.b]
 
-      if len(f) == 0: continue
+      if len(f) == 0: 
+        nexa = nex.a
+        nexb = nex.b
+
+        while True:
+          if endOfA == 0: break
+          if endOfB == 0: break
+
+          endOfA -= 1
+          endOfB -= 1
+          o = old[endOfA]
+          n = new[endOfB]
+
+          if o != n: break
+          if o.isspace(): break
+          if n.isspace(): break
+
+          f = o + f
+          r = o + r
+
+        while True:
+          if nexa >= len(old): break
+          if nexb >= len(new): break
+          o = old[nexa]
+          n = new[nexb]
+
+          if o != n: break
+          if o.isspace(): break
+          if n.isspace(): break
+
+          f += o
+          r += o
+
+          nexa += 1
+          nexb += 1
+        
+        if len(f) < 2: continue
 
       f = re.sub(r"\s+", " ", f)
 

@@ -73,7 +73,7 @@ def AllPossibleSolutions(start, target):
 
       sequences.append(sequenceCopy)
 
-    if anyProgress == False:
+    if anyProgress == False and len(sequence.steps) > 0:
       solvedSequences.append(sequence)
 
   solvedSequences.sort(key = lambda x : x.score /(x.cost + 1),
