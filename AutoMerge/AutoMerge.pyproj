@@ -26,11 +26,27 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DiffCalcs\ReplaceToken.py" />
+    <Compile Include="DiffCalcs\StringReplacement.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DiffCalcs\TokenReorder.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DiffCalcs\U.py" />
     <Compile Include="DiffCalcs\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EquallityLib\__init__.py">
+    <Compile Include="DiffSolver.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Document.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="EquallityLib\__init__.py" />
+    <Compile Include="Merge.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MergeSimplifiers\IncorrectScoping.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MergeSimplifiers\__init__.py">
@@ -41,8 +57,17 @@
   <ItemGroup>
     <Folder Include="DecorLib\" />
     <Folder Include="DiffCalcs\" />
+    <Folder Include="DiffTests\" />
     <Folder Include="EquallityLib\" />
     <Folder Include="MergeSimplifiers\" />
+    <Folder Include="MergeTests\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DiffTests\TokenRenames.txt" />
+    <Content Include="MergeTests\ActualLeak.txt" />
+    <Content Include="MergeTests\DoubleTokenRename.txt" />
+    <Content Include="MergeTests\HugeChunkDeletedWithTinyAddition.txt" />
+    <Content Include="MergeTests\IncludesReorderedIndentedAndDeleted.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

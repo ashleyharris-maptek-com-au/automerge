@@ -1,0 +1,524 @@
+
+<<<<<<< HEAD
+  struct reeS_LayoutDescription
+  {
+    reeS_LayoutDescription() = default;
+
+    template<shadE_DataDescriptor... DATA>
+    void
+    PopulateFromUniformStructure(gbT_PerRenderableUniforms<DATA...> Uniforms)
+    {
+      ASSERT(myUniformAttributes.size() == 0);
+      for (auto& member : Uniforms.OurMembers)
+      {
+        myUniformAttributes.push_back(member);
+      }
+    }
+
+    void PopulateFromDataSet(const gbC_DataSet& D)
+    {
+      ASSERT(myVertexAttributes.size() == 0);
+
+      for (auto& a : D.Attributes())
+      {
+        myVertexAttributes.push_back({a.Descriptor(), a.DescriptorIndex()});
+      }
+
+      hasIndexBuffer = D.HasIndexBuffer();
+    }
+
+    void AddAttribute(shadS_DataReference D)
+    {
+      myVertexAttributes.push_back(D);
+    }
+
+    void AddAttribute(shadE_DataDescriptor D)
+    {
+      myVertexAttributes.push_back({D, 0});
+    }
+
+    memC_SmallVector<shadS_DataReference, 6> myVertexAttributes;
+    memC_SmallVector<shadS_DataReference, 6> myUniformAttributes;
+    Tbool hasIndexBuffer = false;
+    Tbool isDynamic = false;
+
+    // Few more things. Primitive restart?
+
+    Tbool operator==(const reeS_LayoutDescription& Other) const
+    {
+      return myVertexAttributes == Other.myVertexAttributes &&
+        myUniformAttributes == Other.myUniformAttributes &&
+        hasIndexBuffer == Other.hasIndexBuffer && isDynamic == Other.isDynamic;
+    }
+  };
+
+  struct reeS_PipelineDescription
+  {
+    shadC_ProgramGroup myShaderPrimaryId = {};
+    reeF_RenderableSortingFlags mySortingFlags = {};
+    gbE_PrimitiveMode::Type myPrimitiveMode = gbE_PrimitiveMode::Null;
+
+    std::map<shadE_CompileTimeState, Tint8s> myCompileTimeStates;
+    void Set(shadE_CompileTimeState State) { myCompileTimeStates[State] = 1; }
+
+    // Lots more. Most of reeN_State probably.
+
+    Tbool operator==(const reeS_PipelineDescription& Other) const
+    {
+      return myShaderPrimaryId == Other.myShaderPrimaryId &&
+        mySortingFlags == Other.mySortingFlags &&
+        myPrimitiveMode == Other.myPrimitiveMode &&
+        myCompileTimeStates == Other.myCompileTimeStates;
+    }
+    // auto operator<=>(const reeS_PipelineDescription&) const = default;
+  };
+
+  struct reeS_CoordinateSystemDescription
+  {
+    geoS_Point myDataOrigin = geoS_Point::Empty();
+    Tbool isDynamicManipulation = false;
+    Tbool isScreen = false;
+    // isStereoNetPolar?
+    // any other coord system concepts?
+
+    Tbool NearbyAndOtherwiseEqual(
+      const reeS_CoordinateSystemDescription& Other) const
+    {
+      return isDynamicManipulation == Other.isDynamicManipulation &&
+        isScreen == Other.isScreen &&
+        myDataOrigin.DistanceSquaredTo(Other.myDataOrigin) < 1000 * 1000;
+    }
+  };
+
+  using reeS_CoordinateSystemData =
+    gbN_UniformBlocks::S_CoordinateSystemUniformLayout;
+
+  struct reeS_Renderable2
+  {
+    gbC_DataSet myDataSet;
+
+    // Per renderable uniforms.
+    std::vector<Tbyte> myUniformRawData;
+
+    template<class UNIFORM_STRUCTURE> UNIFORM_STRUCTURE& Uniforms()
+    {
+      if (myUniformRawData.size() != sizeof(UNIFORM_STRUCTURE))
+      {
+        myUniformRawData.resize(sizeof(UNIFORM_STRUCTURE));
+      }
+
+      return *reinterpret_cast<UNIFORM_STRUCTURE*>(myUniformRawData.data());
+    }
+
+    template<class UNIFORM_STRUCTURE> const UNIFORM_STRUCTURE& Uniforms() const
+    {
+      if (myUniformRawData.size() != sizeof(UNIFORM_STRUCTURE))
+      {
+        ASSUME_UNREACHABLE();
+      }
+
+      return *reinterpret_cast<const UNIFORM_STRUCTURE*>(
+        myUniformRawData.data());
+    }
+
+    // Dynamic renderables can reserve some extra space on the GPU for
+    // efficient further growth.
+    Tint32u myDynamicRenderableMaxVertexCount = 0;
+    Tint32u myDynamicRenderableMaxIndexCount = 0;
+  };
+
+  struct reeS_RenderPassDescription
+  {
+    // One of three things will happen here:
+
+    // We run a shader full screen quad
+    shadT_ShaderFinalId myFullScreenShader = shadT_ShaderFinalId::Null;
+
+    // We run a compute shader
+    shadT_ShaderFinalId myComputeShader = shadT_ShaderFinalId::Null;
+
+    // Or we'll do a pass over some of the renderables, based on their flags:
+    reeF_RenderableSortingFlags myRenderableSelectionFlagValues =
+      reeT_RenderableSortingFlags::Null;
+    reeF_RenderableSortingFlags myRenderableSelectionFlagMasks =
+      reeT_RenderableSortingFlags::Null;
+
+    Tstring myDebugName;
+
+    void RequireTrue(reeT_RenderableSortingFlags Flag)
+    {
+      myRenderableSelectionFlagValues |= Flag;
+      myRenderableSelectionFlagMasks |= Flag;
+    }
+
+    void RequireFalse(reeT_RenderableSortingFlags Flag)
+    {
+      myRenderableSelectionFlagValues &= ~Flag;
+      myRenderableSelectionFlagMasks |= Flag;
+    }
+
+    void Ignore(reeT_RenderableSortingFlags Flag)
+    {
+      myRenderableSelectionFlagMasks &= ~Flag;
+    }
+
+    // Compute / full screen shaders read stuff in.
+    std::vector<reeN_Cobalt::ITextureBuffer2D*> myInputTextures;
+
+    // We can output to textures.
+    std::vector<reeN_Cobalt::ITextureBuffer2D*> myOutputTextures;
+
+    // Or a window.
+    reeN_Cobalt::IFrameBuffer* myOutputWindow = nullptr;
+
+    // Of any size
+    Tuvec4 myOutputViewport = Tuvec4(0);
+
+    // (which can be shared - help keep passes decoupled from each other)
+    reeT_ViewportId myViewportId = reeT_ViewportId::Null;
+
+    // And (optionally) clear the window / texture before rendering.
+    std::vector<std::optional<Tfloat32>> myDepthClearValues;
+    std::vector<std::optional<Tvec4>> myColourClearValues;
+    // Output texture clear values are provided before windows.
+
+    std::function<void(Tuvec4*, reeT_ViewportId, reeS_RenderPassDescription*)>
+      myViewportSizor;
+    // A function that modifies the viewport for this pass when a window resize
+    // occurs. If null, just resizes the output textures and framebuffer to
+    // match the new output size. Used to impliment SSAA (the buffers may be
+    // scaled) or shadow casting (the shadow buffers may be a fixed size), or
+    // anything else in which window sizing isn't trivial.
+
+    // Tweak with the compilation of shaders within the pass.
+    std::map<shadE_CompileTimeState, Tint8s> myCompileTimeStates;
+    void Set(shadE_CompileTimeState State) { myCompileTimeStates[State] = 1; }
+
+    // By default all passes execute sequentially, however that may not be
+    // optimal setting pass dependancies (to the indices of earlier passes)
+    // allows this to be adjusted so multiple passes run in parallel. -1 means
+    // "just run sequentially".
+    std::vector<shadT_RenderPassId> myCustomPassDependancies = {
+      shadT_RenderPassId::Null};
+
+    Tbool operator==(const reeS_RenderPassDescription& Other) const
+    {
+      return myFullScreenShader == Other.myFullScreenShader &&
+        myComputeShader == Other.myComputeShader &&
+        myRenderableSelectionFlagValues ==
+        Other.myRenderableSelectionFlagValues &&
+        myRenderableSelectionFlagMasks ==
+        Other.myRenderableSelectionFlagMasks &&
+        myInputTextures == Other.myInputTextures &&
+        myOutputTextures == Other.myOutputTextures &&
+        myOutputWindow == Other.myOutputWindow &&
+        myOutputViewport == Other.myOutputViewport &&
+        myDepthClearValues == Other.myDepthClearValues &&
+        myColourClearValues == Other.myColourClearValues &&
+        myCompileTimeStates == Other.myCompileTimeStates &&
+        myCustomPassDependancies == Other.myCustomPassDependancies;
+    }
+  };
+
+  struct reeS_RenderModeDescription
+  {
+    std::vector<reeS_RenderPassDescription> myPasses;
+    Tbool operator==(const reeS_RenderModeDescription& Other) const
+    {
+      return myPasses == Other.myPasses;
+    }
+  };
+
+  struct reeS_ShaderCompilationMap
+  {
+    shadC_ProgramGroup myShaderGroup = shadC_ProgramGroup();
+    shadT_ShaderFinalId myFinalId = shadT_ShaderFinalId();
+    shadT_RenderModeId myRenderMode = shadT_RenderModeId::Null;
+    shadT_RenderPassId myRenderPass = shadT_RenderPassId::Null;
+    shadT_PipelineId myPipeline = shadT_PipelineId::Null;
+    shadC_ExecutionState myPipelineAndRenderModeState = {};
+
+    Tbool operator<(const reeS_ShaderCompilationMap& Other) const
+    {
+      // We sort first by shader ID, then mode / pass, then by tightest mode
+      // match. So that you can work your way through a sorted vector and the
+      // first flag group that matches wins.
+      return myShaderGroup.ToInt() < Other.myShaderGroup.ToInt() &&
+        myRenderMode < Other.myRenderMode &&
+        myRenderPass < Other.myRenderPass && myPipeline < Other.myPipeline;
+    }
+
+    Tbool operator==(const reeS_ShaderCompilationMap& Other) const
+    {
+      return myShaderGroup == Other.myShaderGroup &&
+        myRenderMode == Other.myRenderMode &&
+        myRenderPass == Other.myRenderPass && myPipeline == Other.myPipeline;
+    }
+  };
+
+
+||||||| parent of 135d41a72cb... @@secondTidy@@Split several description structs out into their own file
+    struct reeS_LayoutDescription
+  {
+    reeS_LayoutDescription() = default;
+
+    template<shadE_DataDescriptor... DATA>
+    void
+    PopulateFromUniformStructure(gbT_PerRenderableUniforms<DATA...> Uniforms)
+    {
+      ASSERT(myUniformAttributes.size() == 0);
+      for (auto& member : Uniforms.OurMembers)
+      {
+        myUniformAttributes.push_back(member);
+      }
+    }
+
+    void PopulateFromDataSet(const gbC_DataSet& D)
+    {
+      ASSERT(myVertexAttributes.size() == 0);
+
+      for (auto& a : D.Attributes())
+      {
+        myVertexAttributes.push_back({a.Descriptor(), a.DescriptorIndex()});
+      }
+
+      hasIndexBuffer = D.HasIndexBuffer();
+    }
+
+    void AddAttribute(shadS_DataReference D)
+    {
+      myVertexAttributes.push_back(D);
+    }
+
+    void AddAttribute(shadE_DataDescriptor D)
+    {
+      myVertexAttributes.push_back({D, 0});
+    }
+
+    memC_SmallVector<shadS_DataReference, 6> myVertexAttributes;
+    memC_SmallVector<shadS_DataReference, 6> myUniformAttributes;
+    Tbool hasIndexBuffer = false;
+    Tbool isDynamic = false;
+
+    // Few more things. Primitive restart?
+
+    Tbool operator==(const reeS_LayoutDescription& Other) const
+    {
+      return myVertexAttributes == Other.myVertexAttributes &&
+        myUniformAttributes == Other.myUniformAttributes &&
+        hasIndexBuffer == Other.hasIndexBuffer && isDynamic == Other.isDynamic;
+    }
+  };
+
+  struct reeS_PipelineDescription
+  {
+    shadC_ProgramGroup myShaderPrimaryId = {};
+    reeF_RenderableSortingFlags mySortingFlags = {};
+    gbE_PrimitiveMode::Type myPrimitiveMode = gbE_PrimitiveMode::Null;
+
+    std::map<shadE_CompileTimeState, Tint8s> myCompileTimeStates;
+    void Set(shadE_CompileTimeState State) { myCompileTimeStates[State] = 1; }
+
+    // Lots more. Most of reeN_State probably.
+
+    Tbool operator==(const reeS_PipelineDescription& Other) const
+    {
+      return myShaderPrimaryId == Other.myShaderPrimaryId &&
+        mySortingFlags == Other.mySortingFlags &&
+        myPrimitiveMode == Other.myPrimitiveMode &&
+        myCompileTimeStates == Other.myCompileTimeStates;
+    }
+    // auto operator<=>(const reeS_PipelineDescription&) const = default;
+  };
+
+  struct reeS_CoordinateSystemDescription
+  {
+    geoS_Point myDataOrigin = geoS_Point::Empty();
+    Tbool isDynamicManipulation = false;
+    Tbool isScreen = false;
+    // isStereoNetPolar?
+    // any other coord system concepts?
+
+    Tbool NearbyAndOtherwiseEqual(
+      const reeS_CoordinateSystemDescription& Other) const
+    {
+      return isDynamicManipulation == Other.isDynamicManipulation &&
+        isScreen == Other.isScreen &&
+        myDataOrigin.DistanceSquaredTo(Other.myDataOrigin) < 1000 * 1000;
+    }
+  };
+
+  using reeS_CoordinateSystemData =
+    gbN_UniformBlocks::S_CoordinateSystemUniformLayout;
+
+  struct reeS_Renderable2
+  {
+    gbC_DataSet myDataSet;
+
+    // Per renderable uniforms.
+    std::vector<Tbyte> myUniformRawData;
+
+    template<class UNIFORM_STRUCTURE> UNIFORM_STRUCTURE& Uniforms()
+    {
+      if (myUniformRawData.size() != sizeof(UNIFORM_STRUCTURE))
+      {
+        myUniformRawData.resize(sizeof(UNIFORM_STRUCTURE));
+      }
+
+      return *reinterpret_cast<UNIFORM_STRUCTURE*>(myUniformRawData.data());
+    }
+
+    template<class UNIFORM_STRUCTURE> const UNIFORM_STRUCTURE& Uniforms() const
+    {
+      if (myUniformRawData.size() != sizeof(UNIFORM_STRUCTURE))
+      {
+        ASSUME_UNREACHABLE();
+      }
+
+      return *reinterpret_cast<const UNIFORM_STRUCTURE*>(
+        myUniformRawData.data());
+    }
+
+    // Dynamic renderables can reserve some extra space on the GPU for
+    // efficient further growth.
+    Tint32u myDynamicRenderableMaxVertexCount = 0;
+    Tint32u myDynamicRenderableMaxIndexCount = 0;
+  };
+
+  struct reeS_RenderPassDescription
+  {
+    // One of three things will happen here:
+
+    // We run a shader full screen quad
+    shadT_ShaderFinalId myFullScreenShader = shadT_ShaderFinalId::Null;
+
+    // We run a compute shader
+    shadT_ShaderFinalId myComputeShader = shadT_ShaderFinalId::Null;
+
+    // Or we'll do a pass over some of the renderables, based on their flags:
+    reeF_RenderableSortingFlags myRenderableSelectionFlagValues =
+      reeT_RenderableSortingFlags::Null;
+    reeF_RenderableSortingFlags myRenderableSelectionFlagMasks =
+      reeT_RenderableSortingFlags::Null;
+
+    Tstring myDebugName;
+
+    void RequireTrue(reeT_RenderableSortingFlags Flag)
+    {
+      myRenderableSelectionFlagValues |= Flag;
+      myRenderableSelectionFlagMasks |= Flag;
+    }
+
+    void RequireFalse(reeT_RenderableSortingFlags Flag)
+    {
+      myRenderableSelectionFlagValues &= ~Flag;
+      myRenderableSelectionFlagMasks |= Flag;
+    }
+
+    void Ignore(reeT_RenderableSortingFlags Flag)
+    {
+      myRenderableSelectionFlagMasks &= ~Flag;
+    }
+
+    // Compute / full screen shaders read stuff in.
+    std::vector<reeN_Cobalt::ITextureBuffer2D*> myInputTextures;
+
+    // We can output to textures.
+    std::vector<reeN_Cobalt::ITextureBuffer2D*> myOutputTextures;
+
+    // Or a window.
+    reeN_Cobalt::IFrameBuffer* myOutputWindow = nullptr;
+
+    // Of any size
+    Tuvec4 myOutputViewport = Tuvec4(0);
+
+    // (which can be shared - help keep passes decoupled from each other)
+    reeT_ViewportId myViewportId = reeT_ViewportId::Null;
+
+    // And (optionally) clear the window / texture before rendering.
+    std::vector<std::optional<Tfloat32>> myDepthClearValues;
+    std::vector<std::optional<Tvec4>> myColourClearValues;
+    // Output texture clear values are provided before windows.
+
+    std::function<void(Tuvec4*, reeT_ViewportId, reeS_RenderPassDescription*)>
+      myViewportSizor;
+    // A function that modifies the viewport for this pass when a window resize
+    // occurs. If null, just resizes the output textures and framebuffer to
+    // match the new output size. Used to impliment SSAA (the buffers may be
+    // scaled) or shadow casting (the shadow buffers may be a fixed size), or
+    // anything else in which window sizing isn't trivial.
+
+    // Tweak with the compilation of shaders within the pass.
+    std::map<shadE_CompileTimeState, Tint8s> myCompileTimeStates;
+    void Set(shadE_CompileTimeState State) { myCompileTimeStates[State] = 1; }
+
+    std::function<void(
+      reeN_Cobalt::IRenderer* Renderer,
+      const reeS_RenderPassDescription* Pass,
+                       reeN_Cobalt::IStateGroupNode* Group)>
+      myStateOverideCallback;
+
+    // By default all passes execute sequentially, however that may not be
+    // optimal setting pass dependancies (to the indices of earlier passes)
+    // allows this to be adjusted so multiple passes run in parallel. -1 means
+    // "just run sequentially".
+    std::vector<shadT_RenderPassId> myCustomPassDependancies = {
+      shadT_RenderPassId::Null};
+
+    Tbool operator==(const reeS_RenderPassDescription& Other) const
+    {
+      return myFullScreenShader == Other.myFullScreenShader &&
+        myComputeShader == Other.myComputeShader &&
+        myRenderableSelectionFlagValues ==
+        Other.myRenderableSelectionFlagValues &&
+        myRenderableSelectionFlagMasks ==
+        Other.myRenderableSelectionFlagMasks &&
+        myInputTextures == Other.myInputTextures &&
+        myOutputTextures == Other.myOutputTextures &&
+        myOutputWindow == Other.myOutputWindow &&
+        myOutputViewport == Other.myOutputViewport &&
+        myDepthClearValues == Other.myDepthClearValues &&
+        myColourClearValues == Other.myColourClearValues &&
+        myCompileTimeStates == Other.myCompileTimeStates &&
+        myCustomPassDependancies == Other.myCustomPassDependancies;
+    }
+  };
+
+  struct reeS_RenderModeDescription
+  {
+    std::vector<reeS_RenderPassDescription> myPasses;
+    Tbool operator==(const reeS_RenderModeDescription& Other) const
+    {
+      return myPasses == Other.myPasses;
+    }
+  };
+
+  struct reeS_ShaderCompilationMap
+  {
+    shadC_ProgramGroup myShaderGroup = shadC_ProgramGroup();
+    shadT_ShaderFinalId myFinalId = shadT_ShaderFinalId();
+    shadT_RenderModeId myRenderMode = shadT_RenderModeId::Null;
+    shadT_RenderPassId myRenderPass = shadT_RenderPassId::Null;
+    shadT_PipelineId myPipeline = shadT_PipelineId::Null;
+    shadC_ExecutionState myPipelineAndRenderModeState = {};
+
+    Tbool operator<(const reeS_ShaderCompilationMap& Other) const
+    {
+      // We sort first by shader ID, then mode / pass, then by tightest mode
+      // match. So that you can work your way through a sorted vector and the
+      // first flag group that matches wins.
+      return myShaderGroup.ToInt() < Other.myShaderGroup.ToInt() &&
+        myRenderMode < Other.myRenderMode &&
+        myRenderPass < Other.myRenderPass && myPipeline < Other.myPipeline;
+    }
+
+    Tbool operator==(const reeS_ShaderCompilationMap& Other) const
+    {
+      return myShaderGroup == Other.myShaderGroup &&
+        myRenderMode == Other.myRenderMode &&
+        myRenderPass == Other.myRenderPass && myPipeline == Other.myPipeline;
+    }
+  };
+
+=======
+>>>>>>> 135d41a72cb... @@secondTidy@@Split several description structs out into their own file

@@ -62,7 +62,6 @@ class ReplaceToken:
     return out.strip();
 
   def applyTo(self, text) -> str:
-
     for (f, r) in self.tr.items():
       text = re.sub(
         r"\b" + re.escape(f) + r"\b",
@@ -93,6 +92,59 @@ def Process(old : str, new : str):
       r = nT[nex.b - 1]
 
       fr[f] = r
+    elif (nex.a - cur.a - cur.size > 0 and 
+          nex.a - cur.a - cur.size == nex.b - cur.b - cur.size):
+      # This is a sequence of tokens that have changed - this is a bit more risky
+      # as any sequence of words can theoretically match:
+      # "Renderer->Draw(Object.Handle)" and "std::cout << std::endl" - Match?
+      #
+      # To solve - we look at the non-whitespace between the tokens, if that
+      # matches - we consider the token replaced. 
+
+      oldPattern = r"\b" + re.escape(oT[cur.a + cur.size]) + r"\b(.+?)\b"
+      oldPattern += r"\b" + re.escape(oT[cur.a + cur.size + 1]) + r"\b"
+
+      if nex.a > 0:
+        oldPattern = (
+          r"\b" + re.escape(oT[cur.a + cur.size-1]) + r"\b(.+?)\b" +
+          oldPattern)
+      else:
+        oldPattern += r"(.+?)\b" + re.escape(oT[cur.a + cur.size + 2]) + r"\b"
+
+      pattern = re.compile(oldPattern, re.DOTALL)
+
+      oldM = re.findall(pattern, old)
+      newM = re.findall(pattern, new)
+
+      if len(oldM) == 1 and len(newM) == 0:
+
+        newPattern = r"\b" + re.escape(nT[cur.b + cur.size]) + r"\b(.+?)\b"
+        newPattern += r"\b" + re.escape(nT[cur.b + cur.size + 1]) + r"\b"
+
+        if nex.b > 0:
+          newPattern = (
+            r"\b" + re.escape(oT[cur.b + cur.size-1]) + r"\b(.+?)\b" +
+            newPattern)
+        else:
+          newPattern += r"(.+?)\b" + re.escape(oT[cur.b + cur.size + 2]) + r"\b"
+
+        pattern2 = re.compile(newPattern, re.DOTALL)
+
+        oldM2 = re.findall(pattern2, old)
+        newM2 = re.findall(pattern2, new)
+
+        if len(oldM2) == 0 and len(newM2) == 1:
+          between1a = oldM[0][0].strip()
+          between2a = newM2[0][0].strip()
+
+          between1b = oldM[0][1].strip()
+          between2b = newM2[0][1].strip()
+
+          if between1a == between2a and between1b == between2b:
+            f = oT[cur.a + cur.size]
+            r = nT[cur.b + cur.size]
+
+            fr[f] = r
 
   if len(fr) == 0:
     return None

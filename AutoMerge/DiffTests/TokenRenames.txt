@@ -1,0 +1,28 @@
+=Old
+  for (auto [pd, po] :
+    ctlN_Iterate::Bind(rm.myPasses, rm.myPassObjects))
+=New
+  for (auto [passDesc, passObjects] :
+    ctlN_Iterate::Bind(renderMode.myPasses, 
+                       renderMode.myPassObjects))
+=#Summary
+Replace 'pd' with 'passDesc'
+Replace 'po' with 'passObjects'
+Replace 'rm' with 'renderMode'
+=
+
+
+=Old
+myRenderer->DrawLine();
+myRenderer->DrawBackground();
+OsHandler::3DDrawningHandler()->Sync(
+  *myRenderer->WindowHandler()->Hwnd())
+=New
+Context().GetRenderer()->DrawLine();
+Context().GetRenderer()->DrawBackground();
+OsHandler::3DDrawningHandler()->Sync(*Context().
+  GetRenderer()->WindowHandler()->Hwnd())
+=Summary
+Replace 'myRenderer' with 'Context().GetRenderer()'
+=
+

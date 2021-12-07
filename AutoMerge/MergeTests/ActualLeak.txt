@@ -1,0 +1,119 @@
+=#
+This one, as presented by git, has 3 lines missing from the "actual" side
+that are found in the suffix.
+
+A peice of code was refactored from operating on one element that finds, to 
+iterating over all that match, and gits confusing merge could result in the
+if getting duplicated.
+
+This merge is actually unsolvable by auto means - but we can simplify it and
+tidy it up so that the user is less likely to make mistakes.
+
+void mdf::reeC_TreeSyncer::PostProcess(
+  reeN_Commands::S_UpdateVisibilityTask& Cmd)
+{
+  reeN_Factory::WithRenderer([&](reeN_Cobalt::IRenderer* R)
+  {
+    for (auto r : Cmd.myRenderables)
+    {
+      auto& ri = myRenderableInfo[Tsize(r)];
+
+      auto& bl = myBufferLayouts[Tsize(ri.myLayout)];
+      auto& bg = bl.myBufferGroups[Tsize(ri.myBufferGroup)];
+
+      for (auto& pl : ri.myPipelines)
+      {
+<<<<<<< HEAD
+        bg.ForAllPipelineBuffers(pl, [&](S_BufferPipeline* ppdPtr)
+||||||| merged common ancestors
+        auto& ppd = bg.myPerPipelineData[Tsize(pl)];
+
+        if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+=======
+        auto ppdPtr = bg.FindBufferPipeline(shadT_RenderModeId(0), shadT_RenderPassId(0), pl);
+        ASSERT(ppdPtr);
+        auto& ppd = *ppdPtr;
+
+        if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+>>>>>>> 165e22c0cf1484519f6be4ac3bdf3c530a83d7e5
+        {
+          ASSERT(ppdPtr);
+          auto& ppd = *ppdPtr;
+
+          if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+          {
+            ppd.myIndirectDrawBuffer->QueueDataUpdate(
+              ppd.myShadowDrawBuffer.data() + ppd.myShadowFirstChangedByte,
+              ppd.myShadowLastChangedByte - ppd.myShadowFirstChangedByte,
+              ppd.myShadowFirstChangedByte);
+
+            ppd.myShadowFirstChangedByte = -1;
+            ppd.myShadowLastChangedByte = 0;
+          }
+        });
+      }
+    }
+  });
+}
+
+
+<<<<<<<<<<<
+        bg.ForAllPipelineBuffers(pl, [&](S_BufferPipeline* ppdPtr)
+        {
+          ASSERT(ppdPtr);
+          auto& ppd = *ppdPtr;
+
+          if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+|||||||||||
+        auto& ppd = bg.myPerPipelineData[Tsize(pl)];
+
+        if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+==========
+        auto ppdPtr = bg.FindBufferPipeline(shadT_RenderModeId(0), shadT_RenderPassId(0), pl);
+        ASSERT(ppdPtr);
+        auto& ppd = *ppdPtr;
+
+        if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+>>>>>>>>>>
+
+
+
+<<<<<<<<<<<
+        bg.ForAllPipelineBuffers(pl, [&](S_BufferPipeline* ppdPtr)
+        {
+          ASSERT(ppdPtr);
+          auto& ppd = *ppdPtr;
+|||||||||||
+        auto& ppd = bg.myPerPipelineData[Tsize(pl)];
+==========
+        auto ppdPtr = bg.FindBufferPipeline(shadT_RenderModeId(0), shadT_RenderPassId(0), pl);
+        ASSERT(ppdPtr);
+        auto& ppd = *ppdPtr;
+>>>>>>>>>>
+
+
+=#
+
+This is as far as a merge helper can advance - it requires knowledge of the actual code to
+determine what's going on here (actual wins - new was an attempt to fix the same bug but
+didn't cover enough cases).
+
+=#
+      for (auto& pl : ri.myPipelines)
+      {
+<<<<<<<<<<<
+        bg.ForAllPipelineBuffers(pl, [&](S_BufferPipeline* ppdPtr)
+        {
+|||||||||||
+        auto& ppd = bg.myPerPipelineData[Tsize(pl)];
+==========
+        auto ppdPtr = bg.FindBufferPipeline(shadT_RenderModeId(0), shadT_RenderPassId(0), pl);
+>>>>>>>>>>
+          ASSERT(ppdPtr);
+          auto& ppd = *ppdPtr;
+          if (ppd.myIndirectDrawBuffer && ppd.myShadowFirstChangedByte != -1)
+          {
+=# 
+
+
+
