@@ -30,7 +30,7 @@
     <Compile Include="DiffCalcs\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EqualCalcs\__init__.py">
+    <Compile Include="EquallityLib\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MergeSimplifiers\__init__.py">
@@ -41,7 +41,7 @@
   <ItemGroup>
     <Folder Include="DecorLib\" />
     <Folder Include="DiffCalcs\" />
-    <Folder Include="EqualCalcs\" />
+    <Folder Include="EquallityLib\" />
     <Folder Include="MergeSimplifiers\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
