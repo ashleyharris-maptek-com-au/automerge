@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>afb45b2b-c372-4875-b696-5df4e353d0aa</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>UnitTest.py</StartupFile>
+    <StartupFile>MergeSolver.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -52,6 +52,7 @@
     <Compile Include="MergeSimplifiers\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MergeSolver.py" />
     <Compile Include="UnitTest.py" />
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +69,8 @@
     <Content Include="MergeTests\DoubleTokenRename.txt" />
     <Content Include="MergeTests\HugeChunkDeletedWithTinyAddition.txt" />
     <Content Include="MergeTests\IncludesReorderedIndentedAndDeleted.txt" />
+    <Content Include="MergeTests\MissingContext.txt" />
+    <Content Include="MergeTests\SpellingErrorVsFormatting.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -69,6 +69,18 @@ class ReplaceToken:
         text)
     return text
 
+  def cost(self):
+    cost = 0
+    for (f, r) in self.tr.items():
+      cost += len(f)
+      cost += len(r)
+
+      # If we're replacing a tiny string, make this more costly,
+      # as that makes it more risky.
+      if len(f) < 5: cost *= 2
+      if len(f) <= 2: cost *= 2
+    return cost
+
 def Process(old : str, new : str):
   oT = re.findall(r"\b\w+\b",old)
   nT = re.findall(r"\b\w+\b",new)

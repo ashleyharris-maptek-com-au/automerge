@@ -8,3 +8,14 @@ These may involve:
 - partially applying bits of the merge.
 - Extracting equal chunks out of the merge.
 """
+
+import pkgutil
+
+allMergeSimplifiers = []
+
+for a in pkgutil.iter_modules(['MergeSimplfiers']):
+  exec("from MergeSimplfiers import " + a.name + " as t")
+
+  if "Process" in dir(t):
+    allMergeSimplifiers.append(t.Process)
+

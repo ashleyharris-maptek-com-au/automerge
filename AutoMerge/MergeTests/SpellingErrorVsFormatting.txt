@@ -1,0 +1,38 @@
+=GitMerge
+
+
+      std::extent<decltype(local::MenuEntries)>::value;
+  }
+}
+
+const uiC_Text& local::StyleToEditButtonLabel(const uiC_Text& Style)
+{
+  if (Style == local::AdvancedLabel) return local::EditLabel;
+  return local::AdvancedLabel;
+}
+
+<<<<<<<
+std::vector<Tint64u> mtp::cadS_SetLineStyleTransaction::LicenceKeys()
+
+|||||||
+const std::vector<Tint64u>&
+mtp::cadS_SetLineStyleTransaction::LicenseKeys()
+
+=======
+const std::vector<Tint64u>& mtp::cadS_SetLineStyleTransaction::LicenseKeys()
+
+>>>>>>>
+{
+  return {authN::PointStudioCadTools::LicenceKey,
+          authN::BlastLogic::LicenceKey,
+          authN::Eureka::LicenceKey,
+          authN::PerfectDigOffice::LicenceKey};
+}
+
+uiC_Outcome mtp::cadC_SetLineStyleTransaction::Launch()
+{
+  this &= Title(uiC_Text("Line Style"));
+
+=#
+
+

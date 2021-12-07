@@ -11,6 +11,7 @@ class ChangeSequence:
     self.target = target
 
     self.score = difflib.SequenceMatcher(None,start,target).ratio()
+    self.cost = 0
 
     self.steps = []
    
@@ -21,6 +22,7 @@ class ChangeSequence:
     self.actual = result
     self.score = difflib.SequenceMatcher(
       None,self.actual,self.target).ratio()
+    self.cost += diff.cost()
 
   def __str__(self):
     s = ""
@@ -36,6 +38,7 @@ class ChangeSequence:
       a = step.applyTo(s)
       if a is not None: s = a
     return s
+
 
 
 def AllPossibleSolutions(start, target):
@@ -73,7 +76,7 @@ def AllPossibleSolutions(start, target):
     if anyProgress == False:
       solvedSequences.append(sequence)
 
-  solvedSequences.sort(key = lambda x : x.score,
+  solvedSequences.sort(key = lambda x : x.score /(x.cost + 1),
                        reverse = True)
 
   return solvedSequences

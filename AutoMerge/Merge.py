@@ -39,8 +39,8 @@ class Merge(object):
       line = stream.readline().rstrip()
       if line is None: raise "Corrupt merge - no =======";
       if line.startswith("======="): break
-      expectedOld += line
-      expectedOld += "\n"
+      expected += line
+      expected += "\n"
          
     while True:
       line = stream.readline().rstrip()
