@@ -1,0 +1,25 @@
+template< class TRANSACTION>
+Tbool
+mdf::dtfC_ExportDataTransactionModel<TRANSACTION>::ExportedDataExists(
+  Tbool* ConfirmOverwriteFlag)
+{
+<<<<<<< HEAD
+  if (Qualifiers().UserData("IsOverwriteConfirmSuppressed").IsDefined() &&
+      Qualifiers().UserData("IsOverwriteConfirmSuppressed").Get<Tbool>())
+||||||| parent of 8c10feb78de... JOB-29046: Improvements for Clang and GCC
+  if (this->Qualifiers()
+        .UserData("IsOverwriteConfirmSuppressed")
+        .IsDefined() &&
+      this->Qualifiers().UserData("IsOverwriteConfirmSuppressed").Get<Tbool>())
+=======
+  if (this->Qualifiers()
+        .UserData("IsOverwriteConfirmSuppressed")
+        .IsDefined() &&
+      this->Qualifiers().UserData(
+        "IsOverwriteConfirmSuppressed").template Get<Tbool>())
+>>>>>>> 8c10feb78de... JOB-29046: Improvements for Clang and GCC
+  {
+    // This is being run programmatically, and we have been told to always
+    // overwrite.
+    return false;
+  }

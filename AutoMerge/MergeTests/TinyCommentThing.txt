@@ -1,0 +1,17 @@
+#endif
+<<<<<<<
+// Add a ASSUME_NYI() that forwards onto ASSUME_UNREACHABLE(), however that is
+// defined. This is basically shorthand for "This path hasn't been written yet,
+// and I don't want the compiler wasting time in optimised builds checking for
+// it, but in debug fail if it's hit."
+|||||||
+
+=======
+// Add a ASSUME_NYI() that forwards onto however unreachable is defined. This
+// is basically shorthand for "This path hasn't been written yet, and I don't
+// want the compiler wasting time in optimised builds checking for it, but in
+// debug fail if it's hit."
+>>>>>>>
+#define ASSUME_NYI() ASSUME_UNREACHABLE()
+#define ASSUMEF_NYI(TEXT) ASSUMEF_UNREACHABLE(TEXT)
+///////////////////////////////////////////////////////////////////////////////

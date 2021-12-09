@@ -1,0 +1,97 @@
+
+class DependencyTool(Tool):
+  """A Cake tool for managining library dependencies for C and C++ projects.
+
+  Usage:
+    # Set-up the tool in the config.cake..
+    base = Variant()
+    # (Not shown is the setup for base.tools["env"])
+    base.tools["depends"] = DependencyTool(
+      configuration=configuration,
+      env=base.tools["env"])
+    base.tools['depends'].loadFromYaml('path to yaml file')
+
+    # Usage within a Cake script
+    from cake.tools import depends, script
+    script.include(depends.includeScriptsFor('library_name'))
+  """
+
+  def __init__(self, configuration, env):
+    Tool.__init__(self, configuration)
+    self.env = env
+    self.depends = MaptekDependencies([])
+
+<<<<<<< HEAD
+  def includeScriptsFor(self, library):
+    """Return the list of include scripts needed for the given library."""
+||||||| parent of 45d5aef5b69... JOB-29017: Platform libraries are now be specified in YAML instead of cakegen.py
+  def includeScriptsFor(self, library, includeCake=False):
+    """Return the list of include scripts needed for the given library.
+
+    If includeCake is true then this will be the list of scripts to include
+    when including library in another library. Otherwise it is the list of
+    scripts to include when building the library.
+    """
+=======
+  def addPlatformLibraries(self, library, platform, compiler):
+    """Add any platform specific libraries for the given library to the
+    compiler.
+
+    Platform libraries are libraries without a Cake script and are typically
+    found in the library path and are generally part of the platform. For
+    example, user32 for Windows (part of the Windows SDK).
+
+    For an example of what the data might look like in a YAML file:
+    - name: font
+      platformLibraries:
+        linux: [GLU]
+        windows: [glu32]
+    """
+
+    if library not in self.depends:
+      self.configuration.engine.raiseError(
+        # The list of YAML files loaded is not kept.
+        'Error, no library called "%s" was found. Check in the YAML files.\n' %
+        library,
+        # Should this attribute the target being the Cake script?
+        # That has the risk that it will confuse people.
+        #
+        # We don't know what module or library will be created with this
+        # compiler.
+        targets=[],
+      )
+
+    platformLibraries = self.depends[library].get('platformLibraries', {})
+
+    for library in platformLibraries.get(platform, []):
+      compiler.addLibrary(library)
+
+  def includeScriptsFor(self, library, includeCake=False):
+    """Return the list of include scripts needed for the given library.
+
+    If includeCake is true then this will be the list of scripts to include
+    when including library in another library. Otherwise it is the list of
+    scripts to include when building the library.
+    """
+>>>>>>> 45d5aef5b69... JOB-29017: Platform libraries are now be specified in YAML instead of cakegen.py
+    libraries = self.depends.librariesFor(library)
+
+    includeScripts = [
+        self.configuration.stylePath(self.env.expand(path))
+        for path in self.depends.includeScripts(libraries)
+    ]
+
+    # Handle turning on the static analysis flags.
+    if not self.depends[library].get('suppressAnalyzeFlag', False):
+      includeScripts.append(
+        self.configuration.stylePath(
+          self.env.expand('${MDF_SRC}/analyze.cake'))
+      )
+
+    logger = self.configuration.engine.logger
+    if logger.debugEnabled('depends'):
+      logger.outputDebug(
+        'depends',
+        'Include scripts for %s: %s\n' % (library, ' '.join(includeScripts)))
+
+    return includeScripts

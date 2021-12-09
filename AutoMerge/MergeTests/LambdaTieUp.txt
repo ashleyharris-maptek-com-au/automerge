@@ -1,0 +1,66 @@
+mdf::reeC_CustomVectorExporter::T_Callback local::VectorExporter(Tchar Glyph)
+{
+  using E_ = shadE_DataDescriptor;
+
+<<<<<<< HEAD
+#define LAMBDA_START()                                                        \
+  [=](const gbC_DataSet& SetR,                                                \
+      const reeC_StaticRenderable& Renderable,                                \
+      const reeC_RenderResources& RenderResources,                            \
+      const shadC_ProgramGroup& ShaderProgram,                                \
+      const jsnC_Value& RenderHints,                                          \
+      vgC_Stream* StreamWorldSpace,                                           \
+      vgC_Stream* StreamScreenSpace) {                                        \
+      auto offset =                                                           \
+       Renderable.RenderableTransforms()->myDataOrigin.ToVector();            \
+      auto onePixelWorld =                                                    \
+        RenderResources.myFrustumInformation.OnePixelWorld();                 \
+      for (auto& data : *SetR.BufferFor(E_::VertexCoordinate)->               \
+        Cast<local::S_GlyphData>())
+
+#define LAMBDA_END() }
+||||||| parent of 881a72ecb5a... JOB-29295: Backport some useful things from the cobalt integration branch.
+#define LAMBDA                                                               \
+  [=](                                                                       \
+    const gbC_DataSet& SetR,                                                 \
+    const reeC_StaticRenderable& Renderable,                                 \
+    const reeC_RenderResources& RenderResources,                             \
+    const shadC_ProgramLinked& ShaderProgram,                                \
+    const jsnC_Value& RenderHints,                                           \
+    vgC_Stream* StreamWorldSpace,                                            \
+    vgC_Stream* StreamScreenSpace)                                           \
+    {                                                                        \
+      auto offset =                                                          \
+       Renderable.RenderableTransforms()->myDataOrigin.ToVector();           \
+      auto onePixelWorld =                                                   \
+        RenderResources.myFrustumInformation.OnePixelWorld();                \
+      for (auto& data : *SetR.BufferFor(E_::VertexCoordinate)->              \
+        Cast<local::S_GlyphData>())                                          \
+      {
+=======
+#define LAMBDA_START()                                                        \
+  [=](const gbC_DataSet& SetR,                                                \
+      const reeC_StaticRenderable& Renderable,                                \
+      const reeC_RenderResources& RenderResources,                            \
+      const shadC_ProgramLinked& ShaderProgram,                               \
+      const jsnC_Value& RenderHints,                                          \
+      vgC_Stream* StreamWorldSpace,                                           \
+      vgC_Stream* StreamScreenSpace) {                                        \
+      auto offset =                                                           \
+       Renderable.RenderableTransforms()->myDataOrigin.ToVector();            \
+      auto onePixelWorld =                                                    \
+        RenderResources.myFrustumInformation.OnePixelWorld();                 \
+      for (auto& data : *SetR.BufferFor(E_::VertexCoordinate)->               \
+        Cast<local::S_GlyphData>())
+
+#define LAMBDA_END() }
+>>>>>>> 881a72ecb5a... JOB-29295: Backport some useful things from the cobalt integration branch.
+
+  switch (Glyph)
+  {
+    case '>':
+      return LAMBDA_START()
+      {
+        auto centre =
+          geoS_Point::FromFloatArray(data.myVertexCoordinate.data());
+        auto forwards = gbN::UnPackInt_10_10_10_2(data.myDirection);
