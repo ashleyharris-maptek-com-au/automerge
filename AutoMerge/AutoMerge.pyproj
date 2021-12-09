@@ -50,10 +50,19 @@
     <Compile Include="MergeSimplifiers\IncorrectScoping.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MergeSimplifiers\PartialConcurrentInsertion.py" />
+    <Compile Include="MergeSimplifiers\ConcurrentNoOp.py" />
     <Compile Include="MergeSimplifiers\__init__.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="MergeSolver.py" />
+    <Compile Include="MergeStrategies\DiffForkToDiffChain.py" />
+    <Compile Include="MergeStrategies\DivideAndRecurse.py" />
+    <Compile Include="MergeStrategies\MutualChange.py" />
+    <Compile Include="MergeStrategies\RecursiveSimplification.py" />
+    <Compile Include="MergeStrategies\TokenToLine.py" />
+    <Compile Include="MergeStrategies\UndecorateAndRecurse.py" />
+    <Compile Include="MergeStrategies\__init__.py" />
     <Compile Include="UnitTest.py" />
   </ItemGroup>
   <ItemGroup>
@@ -63,15 +72,20 @@
     <Folder Include="EquallityLib\" />
     <Folder Include="MergeSimplifiers\" />
     <Folder Include="MergeTests\" />
+    <Folder Include="MergeStrategies\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="DiffTests\TokenRenames.txt" />
     <Content Include="MergeTests\ActualLeak.txt" />
+    <Content Include="MergeTests\AddingTemplate.txt" />
     <Content Include="MergeTests\DoubleTokenRename.txt" />
     <Content Include="MergeTests\HugeChunkDeletedWithTinyAddition.txt" />
     <Content Include="MergeTests\IncludesReorderedIndentedAndDeleted.txt" />
+    <Content Include="MergeTests\LambdaTieUp.txt" />
     <Content Include="MergeTests\MissingContext.txt" />
+    <Content Include="MergeTests\MissingContext2.txt" />
     <Content Include="MergeTests\SpellingErrorVsFormatting.txt" />
+    <Content Include="MergeTests\TinyCommentThing.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
