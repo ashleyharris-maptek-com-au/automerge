@@ -6,8 +6,8 @@ def Solve(m : Merge):
   The most common merge conflict - 2 people make different edits to the
   same common revision.
 
-          /- Change A -\ 
-   Start -              ARGH!      Start->Change A->Change B->Phew!
+          /- Change A ------\ 
+   Start ---------------X---ARGH!      Start->Change A->Change B->Phew!
           \- Change B -/
 
   """
