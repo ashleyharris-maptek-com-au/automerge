@@ -2,6 +2,8 @@ from typing import ChainMap, Sequence
 import DiffCalcs
 import difflib
 import copy
+import random
+import DiffCalcs.U as U
 
 class ChangeSequence:
   def __init__(self, start, target) -> None:
@@ -18,7 +20,10 @@ class ChangeSequence:
   def append(self, diff):
     self.steps.append(diff)
     result = diff.applyTo(self.actual)
-    assert(result)
+    assert(result is not None)
+    if(self.actual == result):
+      debugOhCrap = 1
+
     self.actual = result
     self.score = difflib.SequenceMatcher(
       None,self.actual,self.target).ratio()
@@ -33,50 +38,60 @@ class ChangeSequence:
 
     return s
 
+  def __repr__(self):
+    if len(self.steps) == 1:
+      return "1 step"
+    return str(len(self.steps)) + " steps"
+
   def applyTo(self, s):
     for step in self.steps:
       a = step.applyTo(s)
       if a is not None: s = a
     return s
 
+  def clone(self):
+    you = ChangeSequence(self.actual, self.target)
+    you.start = self.start
+    you.cost = self.cost
+    you.steps = copy.copy(self.steps)
+    return you
+
 
 
 def AllPossibleSolutions(start, target):
-  # This algorithm is "kinda inspired" by A* - explore all open
-  # paths prioritising those that appear closest to succeeding first
-
-  sequences = []
-  sequences.append(ChangeSequence(start, target))
-
+  diffAlgs = copy.copy(DiffCalcs.allDiffGenerators)
   solvedSequences = []
 
-  while len(sequences) > 0:
-    # Find the best sequence we know of - 
-    sequences.sort(key = lambda x : x.score)
+  for a in range(20):
+    # In each iteration, change the relative order of each
+    # part of the diff algorithm:
+    random.shuffle(diffAlgs)
 
-    sequence = sequences.pop()
+    sequence = ChangeSequence(start, target)
 
-    if sequence.score == 1.0:
-      solvedSequences.append(sequence)
-      continue
+    while True:
+      anyProgress = False
 
-    anyProgress = False
+      for gen in diffAlgs:
+        while True:
+          change = gen(sequence.actual, sequence.target)
+          if change is None: 
+            break
 
-    for gen in DiffCalcs.allDiffGenerators:
-      change = gen(sequence.actual, sequence.target)
-      if change is None: 
-        continue
-      anyProgress = True
+          sequence.append(change)
+          anyProgress = True
 
-      sequenceCopy = copy.copy(sequence)
-      sequenceCopy.append(change)
+      if anyProgress == False: break
+    solvedSequences.append(sequence)
 
-      sequences.append(sequenceCopy)
-
-    if anyProgress == False and len(sequence.steps) > 0:
-      solvedSequences.append(sequence)
 
   solvedSequences.sort(key = lambda x : x.score /(x.cost + 1),
                        reverse = True)
 
-  return solvedSequences
+  uniqueSequences = [solvedSequences[0]]
+
+  for a, b in U.pairwise(solvedSequences):
+    if a.score != b.score or a.cost != b.cost:
+      uniqueSequences.append(b)
+
+  return uniqueSequences

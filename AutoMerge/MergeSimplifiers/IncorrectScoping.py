@@ -3,6 +3,8 @@ import difflib, copy
 
 def Process(merge : Merge) -> Merge:
 
+  if merge.actual.strip() == "": return
+
   def score(a,b):
     return difflib.SequenceMatcher(None,a,b).ratio()
 
@@ -14,6 +16,7 @@ def Process(merge : Merge) -> Merge:
   lineMax = max(m.expected.count("\n"),
                 m.new.count("\n"),
                 m.suffix.count("\n"))
+  lineMax = min(lineMax, 20) # Realistic limit.
 
   maxScore = max(origScoreAE, origScoreAN)
   maxLines = None
@@ -31,7 +34,12 @@ def Process(merge : Merge) -> Merge:
       maxScore = max(scoreAE, scoreAN)
       maxLines = lineCount
 
-  if maxLines is not None:
+    if lineCount == 10 and maxLines is None:
+      # Early exit on big diffs that aren't going anywhere after
+      # a few lines
+      return None
+
+  if maxLines is not None and maxScore > 0.6:
     # We've improved the score by lengthening actual and shrinking suffix
 
     m = copy.copy(merge)

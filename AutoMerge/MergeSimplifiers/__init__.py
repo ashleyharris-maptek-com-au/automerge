@@ -10,11 +10,15 @@ These may involve:
 """
 
 import pkgutil
+import pathlib
+import sys, os
+folderPath = pathlib.Path(__file__).parent.parent.resolve()
+sys.path.append(folderPath)
 
 allMergeSimplifiers = []
 
-for a in pkgutil.iter_modules(['MergeSimplfiers']):
-  exec("from MergeSimplfiers import " + a.name + " as t")
+for a in pkgutil.iter_modules([ os.path.join(folderPath, 'MergeSimplifiers')]):
+  exec("from MergeSimplifiers import " + a.name + " as t")
 
   if "Process" in dir(t):
     allMergeSimplifiers.append(t.Process)

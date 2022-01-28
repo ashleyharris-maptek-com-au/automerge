@@ -15,6 +15,9 @@ class StringReplacement:
 
     return out.strip();
 
+  def __repr__(self) -> str:
+    return str(self)
+
   def applyTo(self, text) -> str:
     for (f, r) in self.tr.items():
       text = re.sub(
@@ -118,8 +121,8 @@ def Process(old : str, new : str):
             continue
           else:
             disprovedFr[f] = 1
-            del confirmedFr[f]
-            del fr[f]
+            if f in confirmedFr: del confirmedFr[f]
+            if f in fr: del fr[f]
 
         fr[f] = r
 

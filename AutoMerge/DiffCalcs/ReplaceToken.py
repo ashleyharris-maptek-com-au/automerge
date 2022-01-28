@@ -61,6 +61,9 @@ class ReplaceToken:
 
     return out.strip();
 
+  def __repr__(self) -> str:
+    return str(self)
+
   def applyTo(self, text) -> str:
     for (f, r) in self.tr.items():
       text = re.sub(

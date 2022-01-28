@@ -1,0 +1,26 @@
+=GitMerge
+#include "DenseCellNetworkNode.H"
+
+<<<<<<< HEAD
+#include "ColourMapManager.H"
+||||||| merged common ancestors
+#include "ColourMapNumeric1DNode.H"
+=======
+#include "ColourMapManager.H"
+#include "ColourMapNumeric1DNode.H"
+>>>>>>> 01621e0e98cc5f37df414ff8d1707ef856b210bd
+#include "SceneView.H"
+=Expect
+#include "DenseCellNetworkNode.H"
+
+#include "ColourMapManager.H"
+#include "ColourMapManager.H"
+#include "SceneView.H"
+=#
+So this is imperfect, but without external sanitisation (duplicate include
+removal) this is the best we can get.
+
+One side changed the include from ColourMapNumeric1DNode to ColourMapManager.
+The other side added a new include - ColourMapManager.
+
+The correct merge is to have two includes of colour map maanger.

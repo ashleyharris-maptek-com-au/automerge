@@ -4,13 +4,18 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>afb45b2b-c372-4875-b696-5df4e353d0aa</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MergeSolver.py</StartupFile>
+    <StartupFile>Main.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>.</WorkingDirectory>
+    <WorkingDirectory>C:/AshDev/views/cmdf</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>AutoMerge</Name>
     <RootNamespace>AutoMerge</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.9</InterpreterId>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>workbench/dotnet/Mdf.Workbench.ClientPlugin/Views/ChooseProjectViewModel.cs</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +30,9 @@
     <Compile Include="DecorLib\__init__.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DiffCalcs\ChunkRemoval.py" />
+    <Compile Include="DiffCalcs\InsertLines.py" />
+    <Compile Include="DiffCalcs\LineByLineReplacement.py" />
     <Compile Include="DiffCalcs\RemovePartialSequence.py" />
     <Compile Include="DiffCalcs\ReplaceToken.py" />
     <Compile Include="DiffCalcs\StringReplacement.py">
@@ -44,6 +52,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="EquallityLib\__init__.py" />
+    <Compile Include="Main.py" />
     <Compile Include="Merge.py">
       <SubType>Code</SubType>
     </Compile>
@@ -58,6 +67,7 @@
     <Compile Include="MergeSolver.py" />
     <Compile Include="MergeStrategies\DiffForkToDiffChain.py" />
     <Compile Include="MergeStrategies\DivideAndRecurse.py" />
+    <Compile Include="MergeStrategies\IgnoreWhitespace.py" />
     <Compile Include="MergeStrategies\MutualChange.py" />
     <Compile Include="MergeStrategies\RecursiveSimplification.py" />
     <Compile Include="MergeStrategies\TokenToLine.py" />
@@ -76,16 +86,22 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DiffTests\TokenRenames.txt" />
+    <Content Include="MergeStrategies\GitResearch.py" />
     <Content Include="MergeTests\ActualLeak.txt" />
     <Content Include="MergeTests\AddingTemplate.txt" />
     <Content Include="MergeTests\DoubleTokenRename.txt" />
     <Content Include="MergeTests\HugeChunkDeletedWithTinyAddition.txt" />
+    <Content Include="MergeTests\IncludeChangeAndDelete.txt" />
     <Content Include="MergeTests\IncludesReorderedIndentedAndDeleted.txt" />
     <Content Include="MergeTests\LambdaTieUp.txt" />
     <Content Include="MergeTests\MissingContext.txt" />
     <Content Include="MergeTests\MissingContext2.txt" />
+    <Content Include="MergeTests\RemoveAndChangeAdjacent.txt" />
     <Content Include="MergeTests\SpellingErrorVsFormatting.txt" />
     <Content Include="MergeTests\TinyCommentThing.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.9" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -10,7 +10,9 @@ class Merge(object):
     self.expected = ""
     self.new = ""
     self.suffix = ""
-
+    self.actualHash = ""
+    self.newHash = ""
+    self.isValid = False
 
   def fromStream(self, stream):
     prefix = ""
@@ -28,6 +30,11 @@ class Merge(object):
       prefix += line
       prefix += "\n"
         
+    if " " in line:
+      marker, space, hash1 = line.partition(" ")
+      if " " in hash1: hash1, space, commitName = hash1.partition(" ")
+      self.actualHash = hash1
+
     while True:
       line = stream.readline().rstrip()
       if line is None: raise "Corrupt merge - no ||||";
@@ -49,6 +56,11 @@ class Merge(object):
       new += line
       new += "\n"
         
+    if " " in line:
+      marker, space, hash2 = line.partition(" ")
+      if " " in hash2: hash2, space, commitName = hash2.partition(" ")
+      self.newHash = hash2
+
     while True:
       line = stream.readline()
       if not line: break
@@ -60,6 +72,8 @@ class Merge(object):
     self.expected = expected
     self.new = new
     self.suffix = suffix
+    self.isValid = True
+
 
   def fromString(self, text):
     self.fromStream(StringIO(text))

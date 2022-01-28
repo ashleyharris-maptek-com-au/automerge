@@ -38,10 +38,14 @@ text argument, modified by the diff if possible.
 """
 
 import pkgutil
+import pathlib
+import sys, os
+folderPath = pathlib.Path(__file__).parent.parent.resolve()
+sys.path.append(folderPath)
 
 allDiffGenerators = []
 
-for a in pkgutil.iter_modules(['DiffCalcs']):
+for a in pkgutil.iter_modules([os.path.join(folderPath,'DiffCalcs')]):
   exec("from DiffCalcs import " + a.name + " as t")
 
   if "Process" in dir(t):

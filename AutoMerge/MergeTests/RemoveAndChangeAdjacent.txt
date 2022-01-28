@@ -1,0 +1,14 @@
+=GitMerge
+<<<<<<<
+    Tstring i = "";
+|||||||
+    std::vector<sysC_Path> destinations = {expectedImage};
+    Tstring i = "";
+=======
+    std::vector<sysC_Path> destinations = {expectedImage};
+    Tstring i = "a";
+>>>>>>>
+=Expect
+    Tstring i = "a";
+=#
+One side removed a line. One side changed the text string.
