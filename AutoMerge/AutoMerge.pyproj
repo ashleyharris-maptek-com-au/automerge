@@ -1,0 +1,77 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>c61aed68-fb3a-4842-b862-89d7fa7de3fe</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>LandmarkLib\LineSection.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>AutoMerge</Name>
+    <RootNamespace>AutoMerge</RootNamespace>
+    <InterpreterId>Global|PythonCore|3.9</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AutoMerge.py" />
+    <Compile Include="LandmarkLib\LineSection.py" />
+    <Compile Include="LandmarkLib\NeighbouringCharacterSelection.py" />
+    <Compile Include="LandmarkLib\TokenOffset.py" />
+    <Compile Include="LandmarkLib\__init__.py" />
+    <Compile Include="MegaDiff\ChangedRegion.py" />
+    <Compile Include="MegaDiff\DeletedRegion.py" />
+    <Compile Include="MegaDiff\DiffOverview.py" />
+    <Compile Include="MegaDiff\InsertedRegion.py" />
+    <Compile Include="MegaDiff\MovedRegion.py" />
+    <Compile Include="MegaDiff\RewrittenRegion.py" />
+    <Compile Include="MegaDiff\UnchangedRegion.py" />
+    <Compile Include="MegaDiff\__init__.py" />
+    <Compile Include="MicroDiff\CodeToComment.py" />
+    <Compile Include="MicroDiff\CommentRewrap.py" />
+    <Compile Include="MicroDiff\CommentToCode.py" />
+    <Compile Include="MicroDiff\LineDeletion.py" />
+    <Compile Include="MicroDiff\LineInsertion.py" />
+    <Compile Include="MicroDiff\LineReorder.py" />
+    <Compile Include="MicroDiff\LineRewrap.py" />
+    <Compile Include="MicroDiff\LineWrap.py" />
+    <Compile Include="MicroDiff\StringDeletion.py" />
+    <Compile Include="MicroDiff\StringInsertion.py" />
+    <Compile Include="MicroDiff\StringMovement.py" />
+    <Compile Include="MicroDiff\StringReplacement.py" />
+    <Compile Include="MicroDiff\StringWrap.py" />
+    <Compile Include="MicroDiff\TokenDelete.py" />
+    <Compile Include="MicroDiff\TokenExtraction.py" />
+    <Compile Include="MicroDiff\TokenInsertion.py" />
+    <Compile Include="MicroDiff\TokenReorder.py" />
+    <Compile Include="MicroDiff\TokenReplace.py" />
+    <Compile Include="MicroDiff\TokenWrap.py" />
+    <Compile Include="MicroDiff\__init__.py" />
+    <Compile Include="U.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MegaDiff\" />
+    <Folder Include="MicroDiff\" />
+    <Folder Include="LandmarkLib\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.9" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

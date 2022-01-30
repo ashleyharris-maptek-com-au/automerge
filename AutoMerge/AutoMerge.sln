@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AutoMerge", "AutoMerge.pyproj", "{C61AED68-FB3A-4842-B862-89D7FA7DE3FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C61AED68-FB3A-4842-B862-89D7FA7DE3FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C61AED68-FB3A-4842-B862-89D7FA7DE3FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5875BC56-DE27-4459-8D0C-D73339FEFDC8}
+	EndGlobalSection
+EndGlobal
