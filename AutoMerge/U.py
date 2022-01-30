@@ -22,3 +22,11 @@ def NiceTokenList(tokenList : list) -> str:
 
 def Ratio(a : str, b : str):
   return difflib.SequenceMatcher(a=a, b=b).ratio()
+
+def Pairwise(iterable):
+  it = iter(iterable)
+  a = next(it, None)
+
+  for b in it:
+      yield (a, b)
+      a = b
