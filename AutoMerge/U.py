@@ -30,3 +30,10 @@ def Pairwise(iterable):
   for b in it:
       yield (a, b)
       a = b
+
+class Dict0(dict):
+  def __missing__(self, key):
+    return 0
+
+def Clamp(minimum, x, maximum):
+    return max(minimum, min(x, maximum))
