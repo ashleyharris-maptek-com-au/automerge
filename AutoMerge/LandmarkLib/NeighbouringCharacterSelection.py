@@ -587,6 +587,10 @@ class CharCount(namedtuple('CharCount',['before', 'mid', 'after'])):
 
 
 
+
+
+
+
 class GrammarScopeCounter(namedtuple('GrammarScopeCounter',['before', 'mid', 'after'])):
   def ScopeCount(s : str):
     return [
@@ -657,6 +661,10 @@ class GrammarScopeCounter(namedtuple('GrammarScopeCounter',['before', 'mid', 'af
 
 
 
+
+
+
+
 class DeltaTokens(namedtuple('DeltaTokens',['token', 'beforeCount', 'midCount', 'afterCount'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
     before = Tokenise(string[0:begin])
@@ -678,6 +686,7 @@ class DeltaTokens(namedtuple('DeltaTokens',['token', 'beforeCount', 'midCount', 
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
     pass
+
 
 
 
