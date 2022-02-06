@@ -214,7 +214,7 @@ class GrammarPartition(namedtuple('GrammarPartition',['before', 'mid', 'after'])
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    strGrammarWithSpaces = re.sub(r"[\s\w]"," ")
+    strGrammarWithSpaces = re.sub(r"[\s\w]"," ",string)
     strGrammarWithoutSpaces = strGrammarWithSpaces.replace(" ", "")
     
     if strGrammarWithoutSpaces != self.before + self.mid + self.after:
@@ -223,22 +223,27 @@ class GrammarPartition(namedtuple('GrammarPartition',['before', 'mid', 'after'])
 
     sWs = ""
     sNs = ""
-    stage = 0
+    stageB = 0
+    stageE = 0
 
-    bookMarks = []
+    bookMarksB = []
+    bookMarksE = []
+
+    beforeMid = self.before + self.mid
 
     for a in range(0, len(strGrammarWithSpaces)):
-      if stage == 0 and sNs == self.before:
-        bookMarks.append(a)
-        stage = 1
-      elif stage == 1 and sNs != self.before:
-        bookMarks.append(a)
-        stage = 2
-      elif stage == 2 and sNs == self.before:
-        bookMarks.append(a)
-        stage = 3
-      elif stage == 3 and sNs != self.before:
-        bookMarks.append(a)
+      if stageB == 0 and sNs == self.before:
+        bookMarksB.append(a)
+        stageB = 1
+      elif stageB == 1 and sNs != self.before:
+        bookMarksB.append(a)
+        stageB = 2
+      
+      if stageE == 0 and sNs == beforeMid:
+        bookMarksE.append(a)
+        stageE = 1
+      elif stageE == 1 and sNs != beforeMid:
+        bookMarksE.append(a)
         break
 
       if not strGrammarWithSpaces[a].isspace():
@@ -246,15 +251,22 @@ class GrammarPartition(namedtuple('GrammarPartition',['before', 'mid', 'after'])
 
       sWs += strGrammarWithSpaces[a]
 
-    r = bookMarks[1] - bookMarks[0] + 1
-    score = 1.0 / r
-    for a in range(bookMarks[0], bookMarks[1]):
-      bScores[a] += score
+    if bookMarksB == bookMarksE:
+      score = 1.0 / (bookMarksB[1] - bookMarksB[0] + 1)
+      for a in range(bookMarksB[0], bookMarksB[1] + 1):
+        bScores[a] += score
+        eScores[a] += score
 
-    r = bookMarks[3] - bookMarks[2] + 1
-    score = 1.0 / r
-    for a in range(bookMarks[3], bookMarks[2]):
-      eScores[a] += score
+    else:
+      r = bookMarksB[1] - bookMarksB[0] + 1
+      score = 1.0 / r
+      for a in range(bookMarksB[0], bookMarksB[1] + 1):
+        bScores[a] += score
+
+      r = bookMarksE[1] - bookMarksE[0] + 1
+      score = 1.0 / r
+      for a in range(bookMarksE[0], bookMarksE[1] + 1):
+        eScores[a] += score
 
 
 
@@ -353,7 +365,10 @@ class CharacterPairParition(namedtuple('CharacterPairParition',['before', 'mid',
     afterEx = after - mid - before
 
     if beforeEx or afterEx:
-      return CharacterPairParition(beforeEx, midEx, afterEx)
+      return CharacterPairParition(
+        ["".join(x) for x in beforeEx],
+        ["".join(x) for x in midEx],
+        ["".join(x) for x in afterEx])
 
   def Summary(self) -> str:
     return ""
@@ -365,15 +380,15 @@ class CharacterPairParition(namedtuple('CharacterPairParition',['before', 'mid',
 
     for pair in self.before:
       f = string.rfind(pair)
-      if f != -1: bS.append(pair + 1)
+      if f != -1: bS.append(f + 1)
 
     for pair in self.after:
       f = string.find(pair)
-      if f != -1: eS.append(pair - 1)
+      if f != -1: eS.append(f - 1)
 
-    for pair in self.mid
+    for pair in self.mid:
       f = string.find(pair)
-      if f != -1: mS.append(pair - 1)
+      if f != -1: mS.append(f - 1)
 
     bS.sort()
     eS.sort()
@@ -437,16 +452,16 @@ class TokenParition(namedtuple('TokenParition',['before', 'mid', 'after'])):
     mS = []
 
     for token in self.before:
-      f = string.rfind(pair)
-      if f != -1: bS.append(pair + 1)
+      f = string.rfind(token)
+      if f != -1: bS.append(f + 1)
 
     for token in self.after:
-      f = string.find(pair)
-      if f != -1: eS.append(pair - 1)
+      f = string.find(token)
+      if f != -1: eS.append(f - 1)
 
-    for token in self.mid
-      f = string.find(pair)
-      if f != -1: mS.append(pair - 1)
+    for token in self.mid:
+      f = string.find(token)
+      if f != -1: mS.append(f - 1)
 
     bS.sort()
     eS.sort()
@@ -483,7 +498,7 @@ class TokenParition(namedtuple('TokenParition',['before', 'mid', 'after'])):
 
     for i in range(b, e + 1):
       for j in range(i + 1, e + 1):
-        beMatrix[(i,i)] += score
+        beMatrix[(i,j)] += score
 
 
 
@@ -517,18 +532,26 @@ class TokenCount(namedtuple('TokenCount',['before', 'mid', 'after'])):
     span = abs(len(l) - expectedTokens) / 2
     if (span > bOffset or span > self.after): span /= 2
 
-    if span < 1: span = 1
+    firstBegin = Clamp(0, math.floor(bOffset - span), len(l))
+    lastBegin = Clamp(0, math.ceil(bOffset + span), len(l))
 
-    firstBegin = math.floor(bOffset - span)
-    lastBegin = math.ceil(bOffset + span)
+    firstEnd = Clamp(0, math.floor(eOffset - span), len(l))
+    lastEnd = Clamp(0, math.ceil(eOffset + span), len(l))
 
-    firstEnd = math.floor(eOffset - span)
-    lastEnd = math.ceil(eOffset + span)
+    firstBegin = l[firstBegin - 1].span()[1]
+    lastBegin = l[lastBegin].span()[0]
 
-    for i in range(b, e + 1):
-      for j in range(i + 1, e + 1):
-        beMatrix[(i,i)] += score
+    firstEnd = l[firstEnd - 1].span()[1]
+    lastEnd = l[lastEnd].span()[0]
 
+
+    score = 1.0 / (lastBegin - firstBegin + 1)
+    for i in range(firstBegin, lastBegin + 1):
+      bScores[i] += score
+
+    score = 1.0 / (lastEnd - firstEnd)
+    for j in range(firstEnd + 1, lastEnd + 1):
+      eScores[i] += score
 
 
 
@@ -544,7 +567,25 @@ class CharCount(namedtuple('CharCount',['before', 'mid', 'after'])):
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+    totalExp = self.before + self.mid + self.after
+    totalAct = len(string)
+
+    ratio = totalAct / float(totalExp)
+
+    begin = ratio * self.before
+    end = ratio * (self.before + self.mid)
+
+    accuracy = math.sqrt(abs(totalAct - totalExp))
+    score = 1.0 / (math.ceil(accuracy) + 1)
+
+    for a in range(math.floor(begin - accuracy), math.ceil(begin + accuracy) + 1):
+      bScores[a] += score
+
+    for a in range(math.floor(end - accuracy), math.ceil(end + accuracy) + 1):
+      eScores[a] += score
+
+
+
 
 class GrammarScopeCounter(namedtuple('GrammarScopeCounter',['before', 'mid', 'after'])):
   def ScopeCount(s : str):
@@ -565,7 +606,56 @@ class GrammarScopeCounter(namedtuple('GrammarScopeCounter',['before', 'mid', 'af
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+
+    counts = [0,0,0,0]
+
+    maybeBegins = []
+    maybeEnds = []
+
+
+    for n in range(len(string)):
+      char = string[n]
+
+      if char == '(': counts[0] += 1
+      if char == ')': counts[0] -= 1
+      if char == '[': counts[1] += 1
+      if char == ']': counts[1] -= 1
+      if char == '{': counts[2] += 1
+      if char == '}': counts[2] -= 1
+      if char == '<': counts[3] += 1
+      if char == '>': counts[3] -= 1
+
+      if counts == self.before:
+        maybeBegins.append(n)
+
+    counts = [0,0,0,0]
+
+    for n in range(len(string) - 1, maybeBegins[0], -1):
+      char = string[n]
+
+      if char == '(': counts[0] += 1
+      if char == ')': counts[0] -= 1
+      if char == '[': counts[1] += 1
+      if char == ']': counts[1] -= 1
+      if char == '{': counts[2] += 1
+      if char == '}': counts[2] -= 1
+      if char == '<': counts[3] += 1
+      if char == '>': counts[3] -= 1
+
+      if counts == self.after:
+        maybeEnds.append(n)
+
+    score = 1.0 / len(maybeBegins)
+    for a in maybeBegins:
+      bScores[a] += score
+
+    score = 1.0 / len(maybeEnds)
+    for a in maybeEnds:
+      eScores[a] += score
+
+
+
+
 
 class DeltaTokens(namedtuple('DeltaTokens',['token', 'beforeCount', 'midCount', 'afterCount'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
@@ -588,6 +678,10 @@ class DeltaTokens(namedtuple('DeltaTokens',['token', 'beforeCount', 'midCount', 
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
     pass
+
+
+
+
 
 class DeltaChars(namedtuple('DeltaChars',['char','left','mid','right'])):
   def CharMap(alphabet : str, s : str):
@@ -631,7 +725,31 @@ class DeltaChars(namedtuple('DeltaChars',['char','left','mid','right'])):
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+
+    expectedCount = self.left + self.mid + self.right
+    actualCount = string.count(self.char)
+
+    ratio = float(actualCount) / expectedCount
+
+    places = []
+
+    for f in re.finditer(re.escape(self.char), string):
+      places.append(f.span()[0])
+
+    bIndex = math.floor(self.left * ratio) - 1
+
+    eIndex = math.ceil((self.left + self.mid) * ratio)
+
+    r = range(places[bIndex], places[bIndex + 1] + 1)
+    for b in r:
+      bScores[b] += 1.0 / len(r)
+
+
+    r = range(places[eIndex - 1], places[eIndex] + 1)
+    for e in r:
+      eScores[e] += 1.0 / len(r)
+
+
 
 class DeltaGrammar(namedtuple('DeltaGrammar',['before', 'mid', 'after'])):
   def ToGrammar(s :str):
@@ -653,6 +771,11 @@ class DeltaGrammar(namedtuple('DeltaGrammar',['before', 'mid', 'after'])):
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
     pass
 
+
+
+
+
+
 class SelectionString(namedtuple('SelectionString',['impl'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
     return SelectionString(string[begin:end])
@@ -662,6 +785,17 @@ class SelectionString(namedtuple('SelectionString',['impl'])):
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
     pass
+
+
+
+
+
+
+
+
+
+
+
 
 class SelectionTokens(namedtuple('SelectionTokens',['impl'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
@@ -673,6 +807,15 @@ class SelectionTokens(namedtuple('SelectionTokens',['impl'])):
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
     pass
 
+
+
+
+
+
+
+
+
+
 class SelectionBoundingChars(namedtuple('SelectionBoundingChars',['begin', 'end'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
     return SelectionBoundingChars(
@@ -683,7 +826,36 @@ class SelectionBoundingChars(namedtuple('SelectionBoundingChars',['begin', 'end'
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+
+    if self.begin[0] == self.begin[1] and (self.begin + self.begin[0]) in string:
+      pass
+      # this is too hard - looking for AA in a string containing AAA has multiple matches
+    else:
+
+      b = []
+      for f in re.finditer(re.escape(self.begin), string):
+        b.append(f.span()[0] + 1)
+        
+      score = 1.0 / (1 + len(b))
+      for a in b:
+        bScores[a] += score
+
+
+      e = []
+      for f in re.finditer(re.escape(self.end), string):
+        e.append(f.span()[0] + 1)
+        
+      score = 1.0 / (1 + len(e))
+      for a in b:
+        eScores[a] += score
+
+
+
+
+
+
+
+
 
 class CharOffset(namedtuple('CharOffset',['selectors', 'region', 'charOffset'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
@@ -717,6 +889,14 @@ class CharOffset(namedtuple('CharOffset',['selectors', 'region', 'charOffset']))
     pass
 
 
+
+
+
+
+
+
+
+
 class TokenOffset(namedtuple('TokenOffset',['selectors', 'region', 'charOffset'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
     if not allowRecurse: return None
@@ -748,6 +928,15 @@ class TokenOffset(namedtuple('TokenOffset',['selectors', 'region', 'charOffset']
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
     pass
 
+
+
+
+
+
+
+
+
+
 def FindAllCharSelectors(
   string : str, begin : int, end : int, allowRecurse = True) -> list:
 
@@ -759,6 +948,7 @@ def FindAllCharSelectors(
   choices = []
 
   for cls in clsmembers:
+    if cls[1].__module__ == "U": continue
     result = cls[1].Process(string, begin, end, allowRecurse)
     if result is None: continue
     if isinstance(result, list): choices.extend(result)
@@ -777,17 +967,15 @@ def Apply(string : str, selectors : list):
   for i in range(len(string)):
     if bScore[i] > 0:
       for j in range(len(string)):
-        if eScore[j] == 0.0: continue
         key = (i, j)
-        if key in beMatrix: beMatrix[key] += bScore[i]
-        else: beMatrix[key] = bScore[i]
+        if eScore[j] == 0.0 and beMatrix[key] == 0.0: continue
+        beMatrix[key] += bScore[i]
 
     if eScore[i] > 0:
       for j in range(len(string)):
-        if bScore[j] == 0.0: continue
         key = (j, i)
-        if key in beMatrix: beMatrix[key] += eScore[i]
-        else: beMatrix[key] = eScore[i]
+        if bScore[j] == 0.0 and beMatrix[key] == 0.0: continue
+        beMatrix[key] += eScore[i]
 
   
   maxKey = max(beMatrix, key=beMatrix.get)
