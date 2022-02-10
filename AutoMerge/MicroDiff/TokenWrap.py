@@ -32,7 +32,14 @@ except:
 
 class TokenWrap:
   def __init__(self) -> None:
-    self.tr = {}
+    self.prefix = ""
+    self.suffix = ""
+    self.filling = ""
+
+    self.oldLow = ""
+    self.oldHi = ""
+    self.newLow = ""
+    self.newHi = ""
 
   def apply(self, string : str):
     pass # return string, cost
@@ -50,8 +57,19 @@ def Process(old : str, new : str):
   s = sm.get_matching_blocks()
   s.insert(0, difflib.Match(-1, -1, 1))
 
+  options = []
+
   for (a, b, c) in Triplewise(s):
-    if not re.fullmatch(r"\w+", oT[b.a]): continue
+    filling = " ".join(oT[b.a: b.a + b.size])
+    if len(filling) < 3: continue
+    if not re.match(r"\w+", filling): continue
+
+    prefixIndex = a.a + a.size - 1
+
+    if prefixIndex == -1: continue
+
+    prefix = oT[prefixIndex]
+    suffix = oT[c.a]
 
     abOldLow = a.a + a.size
     abOldHi = b.a
@@ -73,30 +91,41 @@ def Process(old : str, new : str):
 
     bcNew = " ".join(nT[bcNewLow : bcNewHi])
 
+    tw = TokenWrap()
+    tw.prefix = prefix
+    tw.suffix = suffix
+    tw.filling = filling
+    tw.oldLow = abOld
+    tw.oldHi = bcOld
+    tw.newLow = abNew
+    tw.newHi = bcNew
+
     if len(abOld) and len(bcOld) and len(abNew) and len(bcNew):
       # We're changing the bread of the token sandwhich
       # a = b(c,d);
       #     |   |
       # a = e(c,f);
-      qwe = 0
+      options.append(tw)
 
     elif len(abOld) and len(bcOld) and len(abOld) == 0and len(bcOld) == 0:
       #We're removing the bread from the token sandwich
       # a = b(c,d);
       #      / 
       # a = c;
-      qwe = 0
+      options.append(tw)
+
     elif len(abNew) and len(bcNew) and len(abOld) == 0 and len(bcOld) == 0:
       #We're adding bread to our token sandwhich
-      # a = b(c,d);
+      # a =   b(c,d) ;
       #       
       # a = e(b(c,d));
-      #     ||      ||
+      #     ||      |
       #     New tokens
-      qwe = 0
+      options.append(tw)
 
-
-    qwe = 0
+  # Now go thorugh all the options, pick the ones that make the most sense and
+  # check they work, and return them
+  raise NotImplemented()
 
 
 if __name__ == '__main__':
