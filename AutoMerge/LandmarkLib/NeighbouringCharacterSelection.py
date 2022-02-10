@@ -348,7 +348,20 @@ class CharacterParition(namedtuple('CharacterParition',['before', 'mid', 'after'
               beMatrix[(i,i)] += score
 
     else:
-      raise NotImplementedError()
+      if bMax < mMin:
+        score = 1.0 / ( mMin - bMax + 1)
+
+        for i in range(bMax, mMin + 1):
+          bScores[i] += score
+
+
+
+      if aMin > mMax:
+        score = 1.0 / ( aMin - mMax + 1)
+
+        for i in range(mMax, aMin + 1):
+          eScores[i] += score
+
 
 
 
@@ -384,11 +397,13 @@ class CharacterPairParition(namedtuple('CharacterPairParition',['before', 'mid',
 
     for pair in self.after:
       f = string.find(pair)
-      if f != -1: eS.append(f - 1)
+      if f != -1: eS.append(f)
 
     for pair in self.mid:
       f = string.find(pair)
-      if f != -1: mS.append(f - 1)
+      if f != -1: 
+        mS.append(f + 1)
+        mS.append(f)
 
     bS.sort()
     eS.sort()
@@ -415,17 +430,40 @@ class CharacterPairParition(namedtuple('CharacterPairParition',['before', 'mid',
 
         score /= 4.0
 
-    else:
-      raise NotImplementedError()
+      score = score / (e - b + 1)
 
-    score = score / (e - b + 1)
-
-    for i in range(b, e + 1):
-      beMatrix[(i,i)] += score
-
-    for i in range(b, e + 1):
-      for j in range(i + 1, e + 1):
+      for i in range(b, e + 1):
         beMatrix[(i,i)] += score
+
+      for i in range(b, e + 1):
+        for j in range(i + 1, e + 1):
+          beMatrix[(i,j)] += score
+
+    else:
+      while len(bS) > 0 and len(mS) > 0 and bS[-1] > mS[0]:
+        bS = bS[0:-1]
+        mS = mS[1:]
+
+      while len(eS) > 0 and len(mS) > 0 and mS[-1] > eS[0]:
+        eS = eS[1:]
+        mS = mS[0:-1]
+
+      if len(bS) > 0 and len(mS) > 0:
+        b1 = bS[-1]
+        b2 = mS[0]
+        score = 1.0 / (b2 - b1 + 1)
+
+        for i in range(b1, b2 + 1):
+          bScores[i] += score
+
+
+        e1 = mS[-1]
+        e2 = eS[0]
+        score = 1.0 / (e2 - e1 + 1)
+
+        for i in range(e1, e2 + 1):
+          eScores[i] += score
+
 
 
 
@@ -453,7 +491,7 @@ class TokenParition(namedtuple('TokenParition',['before', 'mid', 'after'])):
 
     for token in self.before:
       f = string.rfind(token)
-      if f != -1: bS.append(f + 1)
+      if f != -1: bS.append(f + 1 + len(token))
 
     for token in self.after:
       f = string.find(token)
@@ -461,7 +499,9 @@ class TokenParition(namedtuple('TokenParition',['before', 'mid', 'after'])):
 
     for token in self.mid:
       f = string.find(token)
-      if f != -1: mS.append(f - 1)
+      if f != -1: 
+        mS.append(f)
+        mS.append(f + len(token))
 
     bS.sort()
     eS.sort()
@@ -488,17 +528,40 @@ class TokenParition(namedtuple('TokenParition',['before', 'mid', 'after'])):
 
         score /= 4.0
 
+      score = score / (e - b + 1)
+
+      for i in range(b, e + 1):
+        beMatrix[(i,i)] += score
+
+      for i in range(b, e + 1):
+        for j in range(i + 1, e + 1):
+          beMatrix[(i,j)] += score
+
     else:
-      raise NotImplementedError()
+      while len(bS) > 0 and len(mS) > 0 and bS[-1] > mS[0]:
+        bS = bS[0:-1]
+        mS = mS[1:]
 
-    score = score / (e - b + 1)
+      while len(eS) > 0 and len(mS) > 0 and mS[-1] > eS[0]:
+        eS = eS[1:]
+        mS = mS[0:-1]
 
-    for i in range(b, e + 1):
-      beMatrix[(i,i)] += score
+      if len(bS) > 0 and len(mS) > 0:
+        b1 = bS[-1]
+        b2 = mS[0]
+        score = 1.0 / (b2 - b1 + 1)
 
-    for i in range(b, e + 1):
-      for j in range(i + 1, e + 1):
-        beMatrix[(i,j)] += score
+        for i in range(b1, b2 + 1):
+          bScores[i] += score
+
+        e1 = mS[-1]
+        e2 = eS[0]
+        score = 1.0 / (e2 - e1 + 1)
+
+        for i in range(e1, e2 + 1):
+          eScores[i] += score
+
+
 
 
 
@@ -551,7 +614,7 @@ class TokenCount(namedtuple('TokenCount',['before', 'mid', 'after'])):
 
     score = 1.0 / (lastEnd - firstEnd)
     for j in range(firstEnd + 1, lastEnd + 1):
-      eScores[i] += score
+      eScores[j] += score
 
 
 
@@ -685,7 +748,32 @@ class DeltaTokens(namedtuple('DeltaTokens',['token', 'beforeCount', 'midCount', 
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+    l = list(re.finditer(r"\b\w+\b",string))
+
+    actual = len(l)
+    expected = self.beforeCount + self.midCount + self.afterCount
+
+    ratio = float(expected) / actual
+
+    begin = self.beforeCount * ratio
+    end = begin + self.midCount * count
+
+    beginPosLow = l[math.floor(begin)].span()[1]
+    beginPosHi = l[math.ciel(begin)].span()[0]
+
+    if beginPosHi < beginPosLow: beginPosLow = beginPosHi
+
+    endPosLow = l[math.floor(end)].span()[1]
+    endPosHi = l[math.ciel(end)].span()[0]
+
+    if endPosHi < endPosLow: endPosLow = endPosHi
+
+    r = range(beginPosLow, beginPosHi + 1)
+    for q in r: bScores[q] += 1.0 / len(r)
+
+    r = range(endPosLow, endPosHi + 1)
+    for q in r: eScores[q] += 1.0 / len(r)
+
 
 
 
@@ -728,8 +816,6 @@ class DeltaChars(namedtuple('DeltaChars',['char','left','mid','right'])):
 
     return results
 
-
-
   def Summary(self) -> str:
     return ""
 
@@ -760,6 +846,18 @@ class DeltaChars(namedtuple('DeltaChars',['char','left','mid','right'])):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 class DeltaGrammar(namedtuple('DeltaGrammar',['before', 'mid', 'after'])):
   def ToGrammar(s :str):
     punc = re.findall(r"\W+",s.strip())
@@ -778,22 +876,79 @@ class DeltaGrammar(namedtuple('DeltaGrammar',['before', 'mid', 'after'])):
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+    b = []
+    m = []
+    e = []
 
+    for q in self.before: b.append(string.rfind(q))
 
+    for q in self.mid: 
+      b.append(string.rfind(q)) 
+      b.append(string.find(q))
+
+    for q in self.after: e.append(string.find(q))
+
+    b.sort()
+    m.sort()
+    e.sort()
+
+    if len(b) == 0: b.append(0)
+    if len(e) == 0: e.append(len(string))
+
+    if len(m) == 0:
+      b = max(b)
+      e = min(e)
+
+      if b > e: return None
+
+      score = 1.0 / ( e - b + 1)
+
+      for a in range(b, e + 1):
+        bScores[a] += score
+        eScores[a] += score
+
+    else:
+      b = max(b)
+      e = min(e)
+
+      if b > e: return None
+
+      bl = min(b)
+      br = max(b)
+
+      if bl < b: b = bl
+      if br > e: e = br + 1
+
+      score = 1.0 / ( bl - b + 1)
+      for a in range(b, bl + 1):
+        bScores[a] += score
+
+      score = 1.0 / ( e - br + 1)
+      for a in range(br, e + 1):
+        eScores[a] += score
 
 
 
 
 class SelectionString(namedtuple('SelectionString',['impl'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
+    if begin == end: return None
+
     return SelectionString(string[begin:end])
 
   def Summary(self) -> str:
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+    q = []
+
+    for r in (re.finditer(re.escape(self.impl),string)):
+      q.append(r.span())
+
+    score = 1.0 / len(q)
+
+    for r in q:
+      beMatrix[r] += score
 
 
 
@@ -825,6 +980,8 @@ class SelectionTokens(namedtuple('SelectionTokens',['impl'])):
 
 
 
+
+
 class SelectionBoundingChars(namedtuple('SelectionBoundingChars',['begin', 'end'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
     return SelectionBoundingChars(
@@ -836,7 +993,7 @@ class SelectionBoundingChars(namedtuple('SelectionBoundingChars',['begin', 'end'
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
 
-    if self.begin[0] == self.begin[1] and (self.begin + self.begin[0]) in string:
+    if len(self.begin) == 0 or self.begin[0] == self.begin[1] and (self.begin + self.begin[0]) in string:
       pass
       # this is too hard - looking for AA in a string containing AAA has multiple matches
     else:
@@ -849,13 +1006,16 @@ class SelectionBoundingChars(namedtuple('SelectionBoundingChars',['begin', 'end'
       for a in b:
         bScores[a] += score
 
-
+    if len(self.end) == 0 or self.end[0] == self.end[1] and (self.end + self.end[0]) in string:
+      pass
+      # this is too hard - looking for AA in a string containing AAA has multiple matches
+    else:
       e = []
       for f in re.finditer(re.escape(self.end), string):
         e.append(f.span()[0] + 1)
         
       score = 1.0 / (1 + len(e))
-      for a in b:
+      for a in e:
         eScores[a] += score
 
 
@@ -906,7 +1066,7 @@ class CharOffset(namedtuple('CharOffset',['selectors', 'region', 'charOffset']))
 
 
 
-class TokenOffset(namedtuple('TokenOffset',['selectors', 'region', 'charOffset'])):
+class TokenOffset(namedtuple('TokenOffset',['selectors', 'region', 'tokenOffset'])):
   def Process(string : str, begin : int, end : int, allowRecurse = True):
     if not allowRecurse: return None
 
@@ -935,12 +1095,39 @@ class TokenOffset(namedtuple('TokenOffset',['selectors', 'region', 'charOffset']
     return ""
 
   def Apply(self, string : str, bScores : list, eScores : list, beMatrix : dict):
-    pass
+    tokens = list(re.finditer(r"\b\w+\b",string))
+    appliedTokenPos = Apply(string, self.selectors)
+
+    matchIndex = None
+
+    for a in range(len(tokens)):
+      if tokens[a].span() == appliedTokenPos:
+        matchIndex = a
+        break
+
+    if matchIndex is None: return None
+
+    newIndex = matchIndex - self.tokenOffset
+
+    nextIndex = newIndex + 1
+    prevIndex = newIndex - 1
+
+    if self.region == 'begin':
+      bMin = tokens[newIndex].span()[1]
+      bMax = tokens[nextIndex].span()[0]
+
+      r = range(bMin, bMax + 1)
+      for b in r:
+        bScores[b] += 1.0 / len(r)
 
 
+    if self.region == 'end':
+      eMin = tokens[newIndex].span()[1]
+      eMax = tokens[nextIndex].span()[0]
 
-
-
+      r = range(eMin, eMax + 1)
+      for e in r:
+        eScores[e] += 1.0 / len(r)
 
 
 
@@ -985,7 +1172,6 @@ def Apply(string : str, selectors : list):
         key = (j, i)
         if bScore[j] == 0.0 and beMatrix[key] == 0.0: continue
         beMatrix[key] += eScore[i]
-
   
   maxKey = max(beMatrix, key=beMatrix.get)
 
@@ -996,7 +1182,7 @@ def RunUnitTest(prefix : str, mid : str, suffix : str):
 
   selectors = FindAllCharSelectors(string, len(prefix), len(prefix) + len(mid))
 
-  Apply(string,selectors)
+  results = Apply(string,selectors)
 
   i = 0
 
