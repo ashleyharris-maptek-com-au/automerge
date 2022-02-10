@@ -205,7 +205,7 @@ def Solve(old : str, new : str):
 
 def Solve(old : str, new : str):
   oldTokens = Tokenise(old)
-  newTokens = Tokenise(new)
+  #newTokens = Tokenise(new)
 
   maybeMatches = []
 

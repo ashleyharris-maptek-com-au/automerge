@@ -31,7 +31,7 @@ def ToTypicalTokenList(operator : str):
         operator.startswith("<=") or operator.startswith("&&") or
         operator.startswith("||") or operator.startswith("<<") or
         operator.startswith(">>") or operator.startswith("->") or
-        operator.startswith("::")):
+        operator.startswith("//") or operator.startswith("::")):
 
       tokens.append(operator[0:2])
       operator = operator[2:]
