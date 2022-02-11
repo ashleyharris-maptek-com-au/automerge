@@ -87,3 +87,24 @@ def Process(old : str, new : str):
     lineToLineMap[(oldLine, newLine)] += 1
 
   raise NotImplemented()
+
+if __name__ == '__main__':
+  Process("""
+using System;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Windows;
+using System.Windows.Data;
+using JetBrains.Annotations;
+using System.ComponentModel;
+  ""","""
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Data;
+using System.Windows.Data.ExtraThingy;
+using JetBrains.Annotations;
+  """)

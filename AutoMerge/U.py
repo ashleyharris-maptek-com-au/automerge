@@ -37,7 +37,7 @@ def ToTypicalTokenList(operator : str):
       operator = operator[2:]
       continue
 
-    if operator[0].isspace():
+    if operator[0] in " \n\t":
       operator = operator[1:]
       continue
 
