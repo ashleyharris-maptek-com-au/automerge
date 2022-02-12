@@ -56,3 +56,47 @@ width selection.
 
 
 """
+
+import LandmarkLib.LineSelection as _ls
+import LandmarkLib.NeighbouringCharacterSelection as _cs
+
+class LineSelector:
+  def __init__(self):
+    self.selectors = []
+
+  def Search(lines : str):
+    maxIndex, scores = _ls.ApplyLineSelectorsToContent(self.selectors, lines)
+
+    return maxIndex
+
+  def ScorePerLine(lines : str):
+    maxIndex, scores = _ls.ApplyLineSelectorsToContent(self.selectors, lines)
+
+    return scores
+
+
+def DescribeLine(lines : list, lineIndex : int):
+  selectors = _ls.FindAllLineSelectors(lines, lineIndex)
+
+  lineSelector = LineSelector()
+  lineSelector.selectors = selectors
+  return lineSelector
+
+class CharacterRangeSelector:
+  def __init__(self):
+    self.selectors = []
+
+  def Search(lines : str) -> (int,int):
+    pass
+
+  def ScorePerChar(lines : str) -> (list,list):
+    pass
+
+
+def DescribeCharacterRange(string : str, begin : int, end : int):
+  selectors = _cs.FindAllCharSelectors(string, begin, end)
+
+  charSelector = CharacterRangeSelector()
+  charSelector.selectors = selectors
+  return charSelector
+

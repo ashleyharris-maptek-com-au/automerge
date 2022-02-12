@@ -119,3 +119,71 @@ def NextIncrementingSequence(sequence : list):
   if len(sequence) > 0: return sequence[0], sequence[-1]
 
   return None, None
+
+def LineToLineMap(oldLines : list, newLines : list):
+  """Returns a list of pairs mapping lines in old to their best matching lines in new"""
+
+  oldLinesSet = set(oldLines)
+  newLinesSet = set(newLines)
+
+  exactMatches = list(oldLinesSet & newLinesSet)
+
+  freeLinesIn1 = list(oldLinesSet - newLinesSet)
+  freeLinesIn2 = list(newLinesSet - oldLinesSet)
+
+  allScores = []
+
+  for fl1 in freeLinesIn1:
+    for fl2 in freeLinesIn2:
+      allScores.append((Ratio(fl1, fl2), fl1, fl2))
+
+  allScores.sort(reverse = True)
+
+  lineToTextSource = {}
+  l1sUsed = set()
+  l2sUsed = set()
+
+  for score, l1Text, l2Text in allScores:
+    if score < 0.6: continue
+    if l1Text in l1sUsed: continue
+    if l2Text in l2sUsed: continue
+
+    lineToTextSource[l2Text] = l1Text
+
+    l1sUsed.add(l1Text)
+    l2sUsed.add(l2Text)
+
+  lineToLineMap = []
+
+  for ln in range(len(newLines)):
+    lnText = newLines[ln]
+
+    if lnText in exactMatches:
+      loText = lnText
+      if oldLines.count(loText) != 1: continue
+    elif lnText in lineToTextSource:
+      loText = lineToTextSource[lnText]
+      if oldLines.count(loText) != 1: continue
+    else:
+      continue
+
+    sourceIndex = oldLines.index(loText)
+
+    lineToLineMap.append((sourceIndex, ln))
+
+  lineToLineMap.sort()
+
+  return lineToLineMap
+
+def LineToLineMapAndHalwayMap(oldLines : list, newLines : list):
+  """Returns a lineToLineMap, and a halfway map - the old lines rearranged into their best guess
+  new position, new lines inserted, deleted lines removed, but the old lines not changed yet."""
+
+  lineToLineMap = LineToLineMap(oldLines, newLines)
+
+  halfWayLines = newLines[:]
+
+  for o,n in lineToLineMap:
+    halfWayLines[n] = oldLines[o]
+
+  return lineToLineMap, halfWayLines

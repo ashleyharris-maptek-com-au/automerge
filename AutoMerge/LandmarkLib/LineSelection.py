@@ -575,6 +575,7 @@ def FindAllLineSelectors(
   choices = []
 
   for cls in clsmembers:
+    if "Process" not in cls[1].__dict__: continue
     result = cls[1].Process(Lines, ValidIndex, allowRecurse)
     if result is None: continue
     if isinstance(result, list): choices.extend(result)

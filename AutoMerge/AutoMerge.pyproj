@@ -4,14 +4,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c61aed68-fb3a-4842-b862-89d7fa7de3fe</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MicroDiff\LineReorder.py</StartupFile>
+    <StartupFile>MicroDiff\StringDeletion.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>AutoMerge</Name>
     <RootNamespace>AutoMerge</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.9</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AutoMerge.py" />
-    <Compile Include="LandmarkLib\LineSection.py" />
+    <Compile Include="LandmarkLib\LineSelection.py" />
     <Compile Include="LandmarkLib\NeighbouringCharacterSelection.py" />
     <Compile Include="LandmarkLib\__init__.py" />
     <Compile Include="MegaDiff\ChangedRegion.py" />
@@ -62,6 +62,7 @@
     <Folder Include="LandmarkLib\" />
   </ItemGroup>
   <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.7" />
     <InterpreterReference Include="Global|PythonCore|3.9" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

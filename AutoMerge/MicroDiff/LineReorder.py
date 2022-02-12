@@ -12,11 +12,11 @@ except:
   sys.path.insert(0, parentdir) 
   from U import *
 
-neightbourRegex = r"([^\w\s]*)"
+import LandmarkLib
 
-class ReplaceToken:
+class LineReorder:
   def __init__(self) -> None:
-    self.tr = {}
+    self.lineToLineMap = {}
 
   def apply(self, string : str):
     pass # return string, cost
@@ -28,68 +28,57 @@ def Process(old : str, new : str):
   oldLines = old.splitlines()
   newLines = new.splitlines()
 
-  oldLinesSet = set(oldLines)
-  newLinesSet = set(newLines)
+  lineToLineMap = LineToLineMap(oldLines, newLines)
 
-  exactMatches = list(oldLinesSet & newLinesSet)
-
-  freeLinesIn1 = list(oldLinesSet - newLinesSet)
-  freeLinesIn2 = list(newLinesSet - oldLinesSet)
-
-  allScores = []
-
-  for fl1 in freeLinesIn1:
-    for fl2 in freeLinesIn2:
-      allScores.append((Ratio(fl1, fl2), fl1, fl2))
-
-  allScores.sort()
-
-  lineToTextSource = []
-  l1sUsed = set()
-  l2sUsed = set()
-
-  for score, l1Text, l2Text in allScores:
-    if score < 0.6: continue
-    if l1Text in l1sUsed: continue
-    if l2Text in l2sUsed: continue
-
-    lineToTextSource[l2Text] = l1Text
-
-    l1sUsed.add(l1Text)
-    l2sUsed.add(l2Text)
-
-  lineToLineMap = []
-
-  for ln in range(len(newLines)):
-    lnText = newLines[ln]
-
-    if lnText in exactMatches:
-      loText = lnText
-      if oldLines.count(loText) != 1: continue
-    elif lnText in lineToTextSource:
-      loText = lineToTextSource[lnText]
-      if oldLines.count(loText) != 1: continue
-    else:
-      continue
-
-    sourceIndex = oldLines.index(loText)
-
-    lineToLineMap.append((sourceIndex, ln))
-
+  lineToLineMap.append((-1, -1))
   lineToLineMap.sort()
 
-  reorderedLines = []
+  reorderedLines = 0
 
   for a, b in Pairwise(lineToLineMap):
     if b[0] > a[0] and b[1] > a[1]: continue
 
-    reorderedLines.append((
-      oldLines[a[0]],
-      oldLines[b[0]],
-      newLines[a[1]],
-      newLines[b[1]]))
+    reorderedLines += 1
 
-  raise NotImplementedError()
+  if reorderedLines == 0: return None
+
+  lineMap = []
+
+  unhandledLines = set(range(len(newLines)))
+
+  for a, b in Pairwise(lineToLineMap):
+    lineDeltaOld = b[0] - a[0]
+    lineDeltaNew = b[1] - a[1]
+
+    if oldLines[b[0]].strip() == "" and newLines[b[1]].strip() == "": 
+      lineMap.append((None, b[0], b[1], "", ""))
+      unhandledLines.remove(b[1])
+      continue
+
+    if lineDeltaNew == 1 and lineDeltaOld == 1 or b[0] == b[1]: 
+      lineMap.append((None, b[0], b[1], oldLines[b[0]], newLines[b[1]]))
+      unhandledLines.remove(b[1])
+      continue
+
+    lineMap.append((
+      LandmarkLib.DescribeLine(oldLines, b[0]), 
+      b[0], b[1], 
+      oldLines[b[0]], newLines[b[1]]))
+
+    unhandledLines.remove(b[1])
+
+  for uh in unhandledLines:
+    if newLines[uh].strip() == "": continue
+
+    lineMap.append((None, None, uh, None, newLines[uh]))
+
+
+  lr = LineReorder()
+
+  lr.lineToLineMap = lineMap
+
+  return lr
+
 
 if __name__ == '__main__':
   Process("""
@@ -99,9 +88,13 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+
 using JetBrains.Annotations;
+
 using System.ComponentModel;
-  ""","""
+  """.strip(),"""
+using ExtraImports;
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -109,5 +102,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Data.ExtraThingy;
+
 using JetBrains.Annotations;
-  """)
+  """.strip())
