@@ -28,6 +28,7 @@ def ToTypicalTokenList(operator : str):
         operator.startswith("*=") or operator.startswith("/=") or
         operator.startswith("%=") or operator.startswith("==") or
         operator.startswith("!=") or operator.startswith(">=") or
+        operator.startswith("/*") or operator.startswith("*/") or
         operator.startswith("<=") or operator.startswith("&&") or
         operator.startswith("||") or operator.startswith("<<") or
         operator.startswith(">>") or operator.startswith("->") or

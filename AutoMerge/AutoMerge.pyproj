@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c61aed68-fb3a-4842-b862-89d7fa7de3fe</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MicroDiff\StringDeletion.py</StartupFile>
+    <StartupFile>MicroDiff\LineDeletion.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>

@@ -35,6 +35,7 @@ class StringInsertion:
 
 def Process(old : str, new : str):
   oldLines = old.splitlines()
+  newLines = new.splitlines()
 
   # An insertion is the mirror of a deletion, so use that code:
   dc = MicroDiff.StringDeletion.Process(new, old)
@@ -47,23 +48,28 @@ def Process(old : str, new : str):
 
     lineSelector = None
 
-    if lineNo not in lineSelectors:
-      lineSelector = LandmarkLib.DescribeLine(oldLines, lineNo)
-      lineSelectors[lineNo] = lineSelector
+    if lineNo is not None:
+      if lineNo not in lineSelectors:
+        lineSelector = LandmarkLib.DescribeLine(oldLines, lineNo)
+        lineSelectors[lineNo] = lineSelector
+      else:
+        lineSelector = lineSelectors[lineNo]
+
+      if oldLines[lineNo].count(string) != 1:
+        raise NotImplementedError()
+
     else:
-      lineSelector = lineSelectors[lineNo]
 
-    if oldLines[lineNo].count(string) != 1:
-      raise NotImplementedError()
+      lineNo = 0
 
-    index = oldLines[lineNo].find(string)
+    index = newLines[lineNo].find(string)
 
     charSelector = LandmarkLib.DescribeCharacterRange(
       oldLines[lineNo],
       index,
-      index + len(string))
+      index)
 
-    si.chunksToInsert.append((lineSelector, charSelector))
+    si.chunksToInsert.append((lineSelector, charSelector, string))
 
   return si
 
