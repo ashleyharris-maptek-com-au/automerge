@@ -17,3 +17,44 @@ functionCall(
 =Expect
 """
 
+import re
+import itertools
+import difflib
+import LandmarkLib
+import os
+from dataclasses import dataclass
+
+
+try:
+  from ..U import *
+except:
+  import os, inspect, sys
+  currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+  parentdir = os.path.dirname(currentdir)
+  sys.path.insert(0, parentdir) 
+  from U import *
+
+@dataclass
+class WrapArea:
+  firstLine : LandmarkLib.LineSelector
+  lastLine : LandmarkLib.LineSelector
+  lineBreakSelectors : list[LandmarkLib.CharacterRangeSelector]
+
+
+class LineRewrap:
+  def __init__(self) -> None:
+    
+    self.wrapAreas = []
+
+  def apply(self, string : str):
+    pass # return string, cost
+    
+  #def __repr__: pass
+
+def Process(old : str, new : str):
+  oldLines = old.splitlines()
+  newLines = new.splitlines()
+
+  lineToLineMap = LineToLineMap(oldLines, newLines)
+
+  
