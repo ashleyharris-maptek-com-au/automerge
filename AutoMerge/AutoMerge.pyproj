@@ -4,14 +4,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c61aed68-fb3a-4842-b862-89d7fa7de3fe</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>MicroDiff\LineDeletion.py</StartupFile>
+    <StartupFile>MicroDiff\CommentToCode.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>AutoMerge</Name>
     <RootNamespace>AutoMerge</RootNamespace>
-    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.9</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

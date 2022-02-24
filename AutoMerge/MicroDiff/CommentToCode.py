@@ -48,8 +48,73 @@ def Process(old : str, new : str):
   # especially if code was commented out for having a bug, and then uncommented with
   # a fix in the same commit.
 
+  commentRemoved = [False] * len(newLines)
+    
+  for oL, nL, index in zip(halfWayLines, newLines, range(len(newLines))):
+    nLs = nL.strip()
+    oLs = oL.strip()
+    
+    oLss = oLs.removeprefix("//")
 
-  for oL, nL, index in zip(halfWayLines, newLines, index):
+    if oLss != oLs:
+      oLsss = oLss.strip()
+      commentRemoved[index] = oLsss == nLs
 
 
 
+  qwe = ""
+
+
+if __name__ == '__main__':
+  Process("""
+    Syncronise();
+  }
+  //{
+  //  // Background pick object pass.
+  //  mySolidColourBackgroundPickFramebufferPtr =
+  //    myWindowRenderer->CreateFramebuffer();
+  //  mySolidColourBackgroundPickColourRenderbufferPtr =
+  //    CreateRenderbuffer(reeE_InternalFormat::R32UI);
+  //  mySolidColourBackgroundPickDepthAndStencilRenderbufferPtr =
+  //    myWindowRenderer->CreateRenderbuffer(
+  //      reeE_InternalFormat::Depth24_Stencil8);
+
+  //  mySolidColourBackgroundPickFramebufferPtr->AttachRenderbuffer(
+  //    mySolidColourBackgroundPickColourRenderbufferPtr,
+  //    reeE_FramebufferAttachmentPoint::Colour_Attachment0);
+  //  mySolidColourBackgroundPickFramebufferPtr->AttachRenderbuffer(
+  //    mySolidColourBackgroundPickDepthAndStencilRenderbufferPtr,
+  //    reeE_FramebufferAttachmentPoint::Depth_Stencil_Attachment);
+
+  //  myBackgroundPickObjectPass = reeT_RenderPassPtr(new S_Resource(
+  //    mySolidColourBackgroundPickFramebufferPtr)));
+  //}
+  """.strip(),"""
+    Syncronise();
+  }
+  {
+    // Background pick object pass.
+    mySolidColourBackgroundPickFramebufferPtr =
+      myWindowRenderer->CreateFramebuffer();
+    mySolidColourBackgroundPickColourRenderbufferPtr =
+      myWindowRenderer->CreateRenderbuffer(reeE_InternalFormat::R32UI);
+
+    // mySolidColourBackgroundPickDepthAndStencilRenderbufferPtr =
+    //   myWindowRenderer->CreateRenderbuffer(
+    //     reeE_InternalFormat::Depth24_Stencil8);
+
+    RenderBufferCreationImpl(24,8);
+
+    mySolidColourBackgroundPickFramebufferPtr->AttachRenderbuffer(
+      mySolidColourBackgroundPickColourRenderbufferPtr,
+      reeE_FramebufferAttachmentPoint::Colour_Attachment0);
+    mySolidColourBackgroundPickFramebufferPtr->AttachRenderbuffer(
+      mySolidColourBackgroundPickDepthAndStencilRenderbufferPtr,
+      reeE_FramebufferAttachmentPoint::
+        Depth_Stencil_Attachment);
+
+    myBackgroundPickObjectPass = reeT_RenderPassPtr(
+      new T_SolidColourPickPass(reeN_DefaultPassPolicy::MakeResources(
+        mySolidColourBackgroundPickFramebufferPtr)));
+  }
+  """.strip())
